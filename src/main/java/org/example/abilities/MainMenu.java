@@ -49,7 +49,6 @@ public class MainMenu implements AbilityExtension {
                     currentUser.setLesson(null);
                     currentUser.setKeyboardMarkup(MainKeyboard.getMainKeyboard());
                     NormalUsersMap.put(chatId, currentUser);
-                    System.out.println("cc");
                     db.commit();
                     break;
                 case "العودة للسلسلة":
@@ -80,7 +79,7 @@ public class MainMenu implements AbilityExtension {
                         db.commit();
                         break;
                     }
-                    if (!currentUser.getLesson().getName().isEmpty()) {
+                    if (currentUser.getLesson() != null) {
                         Lesson lesson = currentUser.getSeries().getLesson(currentUser.getLesson().getName());
                         if (message.equals("صوتي")) {
                             bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getLink() + ")", chatId);

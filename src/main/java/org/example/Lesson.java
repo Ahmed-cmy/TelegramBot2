@@ -37,9 +37,6 @@ public class Lesson implements Serializable {
     public int getId() {
         return id;
     }
-//    public void setId(int id){
-//        this.id = id;
-//    }
 
     public void setLink(String link) {
         this.link = link;

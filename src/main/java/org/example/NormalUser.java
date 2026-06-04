@@ -2,9 +2,12 @@ package org.example;
 
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class NormalUser implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     private Series series ;
     private Lesson lesson ;
     private long chatId;

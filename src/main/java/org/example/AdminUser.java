@@ -1,8 +1,11 @@
 package org.example;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class AdminUser implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 1L;
     public static enum userActions{
         ADD_SERIES,
         REMOVE_SERIES;
@@ -19,7 +22,6 @@ public class AdminUser implements Serializable {
     public AdminUser(long chatId, Enum<userActions> action){
         this.chatId = chatId;
         this.action = action;
-//        System.out.println(TelegramBot.adminAction.keySet());
     }
     public boolean checkAction (Enum<userActions> action){
         return this.action.equals(action);

@@ -15,9 +15,7 @@ public class Series implements Serializable {
     public static int numberOfSeries = 0;
     private final int id;
     private String name;
-    //    private Map<Integer, Lesson> lessons;
-    private SeriesMap lessons = new SeriesMap();
-//    private List<KeyboardRow> rows;
+    private final SeriesMap lessons = new SeriesMap();
 
     public Series(String name) {
         this.name = name;

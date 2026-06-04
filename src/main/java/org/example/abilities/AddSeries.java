@@ -25,12 +25,10 @@ public class AddSeries implements AbilityExtension {
     private final DBContext db;
     private final AbilityBot bot;
     private Map<Long, AdminUser> adminAction;
-//    private final String waiting = "WAITING_FOR_NAME";
 
     public AddSeries(AbilityBot bot) {
         this.bot = bot;
         this.db = bot.getDb();
-//        System.out.println(TelegramBot.adminAction);
     }
 
     // 2. Define an Ability inside the extension
@@ -42,7 +40,6 @@ public class AddSeries implements AbilityExtension {
                 .locality(ALL)
                 .action(ctx -> {
                     adminAction = TelegramBot.adminAction;
-//                    TelegramBot.admin = true;
                     adminAction.put(ctx.chatId(),new AdminUser(ctx.chatId(), AdminUser.userActions.ADD_SERIES));
                     db.commit();
                     KeyboardRow row = new KeyboardRow("إلغاء");
@@ -57,7 +54,6 @@ public class AddSeries implements AbilityExtension {
                                     .replyMarkup(addKeyboard)
                                     .build()
                     );
-                    System.out.println(adminAction.get(ctx.chatId()).checkAction(AdminUser.userActions.ADD_SERIES));
                 })
                 .build();
     }
@@ -70,7 +66,6 @@ public class AddSeries implements AbilityExtension {
         Predicate<Update> isUserWantAdd = update -> adminAction.get(update.getMessage().getChatId()).checkAction(AdminUser.userActions.ADD_SERIES);
 
         return Reply.of((bot, update) -> {
-//            System.out.println("in");
             long chatId = update.getMessage().getChatId();
             AdminUser currentUser = adminAction.get(chatId);
             String message = update.getMessage().getText();
@@ -86,8 +81,6 @@ public class AddSeries implements AbilityExtension {
                 currentUser.setSeries(message);
                 adminAction.put(chatId, currentUser);
                 db.commit();
-//                System.out.println(adminAction.get(chatId).getSeries()+";");
-//                System.out.println(message);
                 bot.getSilent().send("ارسل السلسلة",update.getMessage().getChatId());
                 return;
             }

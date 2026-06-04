@@ -124,7 +124,6 @@ public class RemoveSeries implements AbilityExtension {
                             .replyMarkup(MainKeyboard.getMainKeyboard())
                             .build()
             );
-//            commandUsed = !commandUsed;
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantDelete);
     }
 
