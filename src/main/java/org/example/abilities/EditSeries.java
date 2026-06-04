@@ -178,7 +178,7 @@ public class EditSeries implements AbilityExtension {
                 rowsCount++;
                 rows.add(new KeyboardRow());
             }
-            rows.get(rowsCount).add(selectedSeries.getLessons().getLesson(i).getName());
+            rows.get(rowsCount).add(selectedSeries.getLesson(i).getName());
         }
         return ReplyKeyboardMarkup.builder()
                 .keyboard(rows)

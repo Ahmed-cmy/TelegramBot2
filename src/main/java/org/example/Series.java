@@ -36,6 +36,13 @@ public class Series implements Serializable {
         return id;
     }
 
+    public Lesson getLesson(int i){
+        return lessons.getLesson(i);
+    }
+    public Lesson getLesson(String name){
+        return lessons.getLesson(name);
+    }
+
     public SeriesMap getLessons() {
         return lessons;
     }
