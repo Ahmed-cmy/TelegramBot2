@@ -4,13 +4,11 @@ import org.example.Lesson;
 import org.example.MainKeyboard;
 import org.example.NormalUser;
 import org.example.TelegramBot;
-import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Reply;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 
 import java.util.Map;
 import java.util.function.Predicate;
@@ -19,15 +17,9 @@ import static org.example.TelegramBot.adminAction;
 import static org.example.TelegramBot.series;
 
 public class MainMenu implements AbilityExtension {
-    private final DBContext db;
+    private DBContext db;
     Map<Long, NormalUser> NormalUsersMap;
-    private AbilityBot bot;
 
-    public MainMenu(AbilityBot bot) {
-        this.bot = bot;
-        db = bot.getDb();
-        NormalUsersMap = db.getMap(TelegramBot.dataBases.NORMAL_USERS.name());
-    }
 
     public Reply getSeriesFromUser() {
         Predicate<Update> hasMessage = (update) -> update.hasMessage();
@@ -36,15 +28,16 @@ public class MainMenu implements AbilityExtension {
         Predicate<Update> isNotAdminCommand = update -> !adminAction.containsKey(update.getMessage().getChatId());
 
         return Reply.of((bot, update) -> {
+            db = bot.getDb();
+            NormalUsersMap = db.getMap(TelegramBot.dataBases.NORMAL_USERS.name());
+
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
-//            System.out.println(message + "lll");
             NormalUsersMap.putIfAbsent(chatId, new NormalUser(chatId));
             db.commit();
-            NormalUser currentUser = NormalUsersMap.get(chatId);
-            System.out.println("hh");
 
-//                    System.out.println("hena");
+            NormalUser currentUser = NormalUsersMap.get(chatId);
+
             switch (message) {
                 case "جميع السلاسل":
                     currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries());
