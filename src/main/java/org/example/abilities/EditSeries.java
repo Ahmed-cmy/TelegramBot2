@@ -1,9 +1,6 @@
 package org.example.abilities;
 
-import org.example.Lesson;
-import org.example.MainKeyboard;
-import org.example.Series;
-import org.example.TelegramBot;
+import org.example.*;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -20,18 +17,15 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class EditSeries implements AbilityExtension {
-    public static Map<Long, Map<String, String>> userState;
     private final DBContext db;
     private final AbilityBot bot;
-    private final String editing = "editing";
-    private final Map<String, Series> series;
-    private Map<String, String> state = new HashMap<>();
+    private Map<Long, AdminUser> adminAction;
+    private Map<String, Series> series;
 
     public EditSeries(AbilityBot bot) {
         this.bot = bot;
-        db = bot.getDb();
-        userState = db.getMap(TelegramBot.dataBases.EDIT_USER_STATE.name());
-        series = db.getMap(TelegramBot.dataBases.SERIES.name());
+        this.db = bot.getDb();
+
     }
 
     public Ability editSeries() {
@@ -41,13 +35,18 @@ public class EditSeries implements AbilityExtension {
                 .privacy(Privacy.ADMIN)
                 .locality(Locality.ALL)
                 .action(ctx -> {
-                    state.put("STATE", editing);
-                    userState.put(ctx.chatId(), state);
+                    adminAction = TelegramBot.adminAction;
+                    series = TelegramBot.series;
+                    AdminUser currentUser = new AdminUser(ctx.chatId(), AdminUser.userActions.EDIT);
+                    currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+                    adminAction.put(ctx.chatId(), currentUser);
+                    db.commit();
+
                     bot.getSilent().execute(
                             SendMessage.builder()
                                     .text("يرجى اختيار سلسلة للتعديل")
                                     .chatId(ctx.chatId())
-                                    .replyMarkup(getAllSeries())
+                                    .replyMarkup(MainKeyboard.getAllSeries())
                                     .build()
                     );
                 })
@@ -58,167 +57,86 @@ public class EditSeries implements AbilityExtension {
         Predicate<Update> hasMessage = (update) -> update.hasMessage();
         Predicate<Update> isMessageHasText = (update) -> update.getMessage().hasText();
         Predicate<Update> isNotCommand = (update) -> !(update.getMessage().getText().startsWith("/"));
-        Predicate<Update> isCommandUsed = update -> userState.containsKey(update.getMessage().getChatId());
+        Predicate<Update> isCommandUsed = update -> adminAction.containsKey(update.getMessage().getChatId());
+        Predicate<Update> isUserWantEdit = update -> adminAction.get(update.getMessage().getChatId()).checkAction(AdminUser.userActions.EDIT);
 
         return Reply.of((bot, update) -> {
             String message = update.getMessage().getText();
-//            String seriesName = adminAction.get(update.getMessage().getChatId());
             long chatId = update.getMessage().getChatId();
-            String currentState = userState.get(chatId).getOrDefault("STATE", "");
+            AdminUser currentUser = adminAction.get(chatId);
+            System.out.println(currentUser.states.toString());
+//            System.out.println(currentUser.states.search(AdminUser.editStates.EDIT_TYPE));
 
-            if (currentState.equals(editing) || db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(userState.get(chatId).get("SELECTED"))) {
-                System.out.println("1");
-                if (message.equals("العودة")) {
-                    userState.remove(chatId);
-                    bot.getSilent().send("تم الإلغاء", chatId);
-                    return;
-                }
-                if (currentState.equals(editing) && !db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(message)) {
-                    bot.getSilent().send("تأكد من اسم السلسلة", chatId);
-                    return;
-                }
-
-                if (message.equals("اختيار سلسلة أخرى") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(userState.get(chatId).get("SELECTED"))) {
-                    state.put("STATE", editing);
-                    userState.put(chatId, state);
-                    db.commit();
-                    bot.getSilent().execute(
-                            SendMessage.builder()
-                                    .text("يرجى اختيار سلسلة للحذف")
-                                    .chatId(chatId)
-                                    .replyMarkup(getAllSeries())
-                                    .build()
-                    );
-                    return;
-                }
-//                confirm deleting
-
-                if (userState.get(chatId).get("STATE").equals(editing)) {
-                    List<KeyboardRow> rows = new ArrayList<>();
-                    rows.add(new KeyboardRow("إضافة درس/دروس", "حذف درس", "تعديل درس"));
-                    rows.add(new KeyboardRow("اختيار سلسلة أخرى"));
-                    rows.add(new KeyboardRow("العودة"));
-
-                    ReplyKeyboardMarkup confirm = ReplyKeyboardMarkup.builder()
-                            .keyboard(rows)
-                            .resizeKeyboard(true)
-                            .build();
-
-                    bot.getSilent().send("اختر التعديل", update.getMessage().getChatId());
-                    Series name = (Series) db.getMap(TelegramBot.dataBases.SERIES.name()).get(message);
-                    bot.getSilent().execute(
-                            SendMessage.builder()
-                                    .text("السلسلة :" + name.getName())
-                                    .chatId(chatId)
-                                    .replyMarkup(confirm)
-                                    .build()
-                    );
-                    state.put("SELECTED", message);
-                    state.put("STATE", "");
-                    userState.put(chatId, state);
-//                System.out.println(adminAction.get(chatId).get("STATE"));
-                    return;
-                }
-            }
-            System.out.println("gg");
-            switch (message) {
-                case "إضافة درس/دروس":
-                    bot.getSilent().execute(
-                            SendMessage.builder()
-                                    .text("اكتب اسم الدرس ثم , ثم اللينك")
-                                    .chatId(chatId)
-                                    .replyMarkup(getSeriesLessonsAsKeyboard(series.get(userState.get(chatId).get("SELECTED"))))
-                                    .build()
-                    );
-                    addNewLessons(chatId, message);
-                    break;
-                case "حذف درس":
-                    break;
-                case "تعديل درس":
-                    break;
-                default:
-                    bot.getSilent().send("اختيار خاطئ", chatId);
-            }
-//            db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId));
-//            adminAction.remove(chatId);
-//            TelegramBot.admin = false;
-//            db.commit();
-
-//            bot.getSilent().execute(
-//                    SendMessage.builder()
-//                            .text("تم الحفظ")
-//                            .chatId(chatId)
-//                            .replyMarkup(MainKeyboard.getMainKeyboard())
-//                            .build()
-//            );
-//            commandUsed = !commandUsed;
-        }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed);
-    }
-
-    public ReplyKeyboardMarkup getAllSeries() {
-        List<KeyboardRow> rows = new ArrayList<>();
-        List<Series> temp = new ArrayList<>(series.values());
-        for (int i = 0; i < series.size(); i++) {
-            rows.add(new KeyboardRow(temp.get(i).getName()));
-        }
-        rows.add(new KeyboardRow("العودة"));
-        return ReplyKeyboardMarkup.builder()
-                .keyboard(rows)
-                .resizeKeyboard(true)
-                .build();
-    }
-
-    public ReplyKeyboardMarkup getSeriesLessonsAsKeyboard(Series selectedSeries) {
-        List<KeyboardRow> rows = new ArrayList<>();
-        for (int i = 0; i < selectedSeries.getLessons().size(); i++) {
-            int rowsCount = 0;
-            rows.add(new KeyboardRow());
-//            System.out.println(lesson.getId());
-            if (i % 2 == 0 && i != 0) {
-                rowsCount++;
-                rows.add(new KeyboardRow());
-            }
-            rows.get(rowsCount).add(selectedSeries.getLesson(i).getName());
-        }
-        return ReplyKeyboardMarkup.builder()
-                .keyboard(rows)
-                .resizeKeyboard(true)
-                .build();
-    }
-
-    public void addNewLessons(long chatId, String message) {
-        Scanner scanner = new Scanner(message);
-        Series selectedSeries = series.getOrDefault(userState.get(chatId).get("SELECTED"), new Series(""));
-        if (selectedSeries.getName().isEmpty()) {
-            bot.getSilent().send("حدث خطأ", chatId);
-            return;
-        }
-//            System.out.println(seriesName);
-        Lesson.count = selectedSeries.getLessons().size() - 1;
-        while (scanner.hasNextLine()) {
-            String[] lessonData = scanner.nextLine().split(",");
-            if (lessonData.length < 2) {
-                bot.getSilent().send("Invalid", chatId);
+            if (currentUser.states.search(AdminUser.editStates.SERIES_SELECT) == 1) {
+                bot.getSilent().execute(
+                        SendMessage.builder()
+                                .text("يرجى اختيار سلسلة للتعديل")
+                                .chatId(chatId)
+                                .replyMarkup(MainKeyboard.getAllSeries())
+                                .build()
+                );
+                currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+                adminAction.put(chatId, currentUser);
+                db.commit();
                 return;
             }
-            if (selectedSeries.getLessons().containsKey(lessonData[0])) {
-                bot.getSilent().send("يوجد درس مكرر يرجى التحقق", chatId);
+            if (currentUser.states.search(AdminUser.editStates.EDIT_TYPE) == 1) {
+                if (!series.containsKey(message)) {
+                    bot.getSilent().send("تحقق من اسم السلسلة", chatId);
+                    return;
+                }
+                currentUser.setSeries(message);
+                adminAction.put(chatId, currentUser);
+                currentUser.states.push(AdminUser.editStates.CHECK_EDIT_TYPE);
+                db.commit();
+                System.out.println("working");
+
+                List<KeyboardRow> rows = new ArrayList<>();
+                rows.add(new KeyboardRow("إضافة درس/دروس", "حذف درس", "تعديل درس"));
+                rows.add(new KeyboardRow("العودة"));
+
+                bot.getSilent().execute(
+                        SendMessage.builder()
+                                .text("اختر")
+                                .chatId(chatId)
+                                .replyMarkup(ReplyKeyboardMarkup.builder()
+                                        .keyboard(rows)
+                                        .resizeKeyboard(true)
+                                        .build())
+                                .build()
+                );
+
                 return;
             }
-            selectedSeries.getLessons().addLesson(new Lesson(lessonData[0], lessonData[1]));
-        }
-        System.out.println("lesson added");
-        userState.remove(chatId);
-//            TelegramBot.admin = false;
-//        db.getMap(TelegramBot.dataBases.SERIES.name()).put(seriesName,series);
-        db.commit();
+            if (currentUser.states.search(AdminUser.editStates.EDIT_TYPE) != -1) {
+                switch (message) {
+                    case "إضافة درس/دروس":
+                        bot.getSilent().execute(
+                                SendMessage.builder()
+                                        .text("اكتب اسم الدرس ثم , ثم link")
+                                        .replyMarkup(ReplyKeyboardMarkup.builder()
+                                                .keyboardRow(new KeyboardRow("العودة"))
+                                                .resizeKeyboard(true)
+                                                .build())
+                                        .build()
+                        );
+                        currentUser.states.push(AdminUser.editStates.ADD_LESSONS);
+                        adminAction.put(chatId, currentUser);
+                        db.commit();
+                        break;
 
-        bot.getSilent().execute(
-                SendMessage.builder()
-                        .text("تم الحفظ")
-                        .chatId(chatId)
-                        .replyMarkup(MainKeyboard.getMainKeyboard())
-                        .build()
-        );
+                    case "حذف درس":
+                        break;
+
+                    case "تعديل درس":
+                        break;
+                    default:
+                        bot.getSilent().send("اختيار خاطئ", chatId);
+                }
+            }
+
+
+        }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantEdit);
     }
+
 }

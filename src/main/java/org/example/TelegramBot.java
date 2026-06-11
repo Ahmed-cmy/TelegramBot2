@@ -1,8 +1,6 @@
 package org.example;
 
-import org.example.abilities.AddSeries;
-import org.example.abilities.MainMenu;
-import org.example.abilities.RemoveSeries;
+import org.example.abilities.*;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
@@ -38,6 +36,12 @@ public class TelegramBot extends AbilityBot {
 
     public AbilityExtension removeSeries() {
         return new RemoveSeries(this);
+    }
+    public AbilityExtension editSeries() {
+        return new EditSeries(this);
+    }
+    public AbilityExtension linkLocator(){
+        return new LinkLocator(this);
     }
 
     @Override

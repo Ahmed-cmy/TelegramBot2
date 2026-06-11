@@ -38,11 +38,15 @@ public class Lesson implements Serializable {
         return id;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public void setLink(String link) {
         this.link = link;
     }
     public ReplyKeyboardMarkup getKeyboard(){
-        List<KeyboardRow> rows =new ArrayList<>();
+        List<KeyboardRow> rows = new ArrayList<>();
         rows.add(new KeyboardRow("صوتي", "فيديو"));
         rows.add(new KeyboardRow("العودة للسلسلة"));
 
