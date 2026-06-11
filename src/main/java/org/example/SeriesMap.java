@@ -16,26 +16,30 @@ public class SeriesMap implements Serializable {
     public Map<String, Lesson> getLessonsMap(){
         return lessonsByName;
     }
+    public boolean containsId (int i){
+        return lessonsById.containsKey(i);
+    }
     public boolean containsKey(String name){
         return lessonsByName.containsKey(name);
     }
     public Lesson getLesson(int i) {
         if(lessonsById.isEmpty()){
-            return null;
+            return new Lesson("not found","");
         }
         return lessonsById.get(i);
     }
     public Lesson getLesson(String name){
         if(lessonsByName.isEmpty()){
-            return null;
+            return new Lesson("not found","");
         }
         return lessonsByName.get(name);
     }
-    public void setLessons(Map<String, Lesson> lessons) {
-        this.lessonsByName = lessons;
+    public void setLessons(Map<Integer, Lesson> lessons) {
+        this.lessonsById = lessons;
         List<Lesson> values = new ArrayList<>(lessons.values());
-        for (Lesson lesson:values){
-            this.lessonsById.put(lesson.getId(),lesson);
+        for (int i = 0; i < lessons.size(); i++) {
+            lessonsByName.put(lessonsById.get(i).getName(),lessonsById.get(i));
+            System.out.println(lessonsById.get(i).getName());
         }
     }
 
