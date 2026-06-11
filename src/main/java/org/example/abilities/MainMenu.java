@@ -24,19 +24,12 @@ public class MainMenu implements AbilityExtension {
     public Reply getSeriesFromUser() {
         Predicate<Update> hasMessage = (update) -> update.hasMessage();
         Predicate<Update> isMessageHasText = (update) -> update.getMessage().hasText();
-        Predicate<Update> isNotCommand = (update) -> {
-            if (update.getMessage().getText().startsWith("/")){
-            NormalUsersMap.remove(update.getMessage().getChatId());
-            db.commit();
-            }
-            return !(update.getMessage().getText().startsWith("/"));
-        };
+        Predicate<Update> isNotCommand = (update) -> !(update.getMessage().getText().startsWith("/"));
         Predicate<Update> isNotAdminCommand = update -> !adminAction.containsKey(update.getMessage().getChatId());
 
         return Reply.of((bot, update) -> {
             db = bot.getDb();
             NormalUsersMap = db.getMap(TelegramBot.dataBases.NORMAL_USERS.name());
-//            db.getMap(TelegramBot.dataBases.NORMAL_USERS.name()).clear();
 
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
@@ -72,8 +65,6 @@ public class MainMenu implements AbilityExtension {
                     db.commit();
                     break;
                 default:
-                    try {
-
                     if (series.containsKey(message)) {
                         currentUser.setSeries(series.get(message));
                         currentUser.setKeyboardMarkup(series.get(message).getKeyboard());
@@ -83,8 +74,6 @@ public class MainMenu implements AbilityExtension {
                     }
                     if (currentUser.getSeries() != null && currentUser.getLesson() == null) {
                         currentUser.setLesson(currentUser.getSeries().getLesson(message));
-//                        System.out.println(currentUser.getSeries().getLessons().getLesson(message).getName());
-
                         currentUser.setKeyboardMarkup(currentUser.getSeries().getLesson(message).getKeyboard());
                         NormalUsersMap.put(chatId, currentUser);
                         db.commit();
@@ -100,9 +89,6 @@ public class MainMenu implements AbilityExtension {
                         return;
                     }
 
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
             }
             String messageText = currentUser.getLesson() != null ?
                     currentUser.getLesson().getName() : currentUser.getSeries() != null ?

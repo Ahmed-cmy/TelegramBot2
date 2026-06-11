@@ -22,10 +22,6 @@ public class Series implements Serializable {
         id = numberOfSeries++;
     }
 
-    public Series() {
-        id = numberOfSeries++;
-    }
-
     public String getName() {
         return name;
     }
@@ -49,16 +45,12 @@ public class Series implements Serializable {
         return lessons;
     }
 
-    public void setLessons(Map<Integer, Lesson> lessons) {
+    public void setLessons(Map<String, Lesson> lessons) {
         this.lessons.setLessons(lessons);
     }
 
     public void addLesson(Lesson lesson) {
         getLessons().addLesson(lesson);
-    }
-
-    public boolean containsId(int i){
-        return lessons.containsId(i);
     }
 
     public ReplyKeyboardMarkup getKeyboard() {
@@ -87,7 +79,7 @@ public class Series implements Serializable {
     public String toString() {
         StringBuilder print = new StringBuilder();
         for (int i = 0; i < getLessons().size(); i++) {
-            print.append(i).append(" - ").append(getLessons().getLesson(i).getName()).append(", ");
+            print.append(getLessons().getLesson(i).getName()).append(", ");
         }
         return print.toString();
     }
