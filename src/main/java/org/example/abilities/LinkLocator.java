@@ -4,6 +4,8 @@ import org.example.AdminUser;
 import org.example.Lesson;
 import org.example.Series;
 import org.example.TelegramBot;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -11,6 +13,10 @@ import org.jsoup.select.Elements;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,73 +35,57 @@ public class LinkLocator implements AbilityExtension {
 //        db = bot.getDb();
     }
 
-    public static Series seriesGetter(String seriesPage, long chatId) throws Exception {
-        String currentURL = seriesPage;
+    public static Series seriesGetter(String currentURL, long chatId) throws Exception {
         Series series = new Series();
-//        Series series = new Series();
         List<String> seriesLessonsPages = new ArrayList<>();
         System.out.println("currentURL" + currentURL);
         try {
-            while (currentURL != null && !currentURL.isEmpty()) {
-                Document doc = Jsoup.connect(currentURL).get();
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(currentURL.replace("details", "metadata")))
+                    .GET()
+                    .build();
 
-                Elements lessonsSet = doc.select("div.col-grid article.item a.global-link");
-                Elements title = doc.select("section.part div.head a h3");
-                series.setName(title.text());
-//                System.out.println(series.getName());
-                for (Element lesson : lessonsSet) {
-                    seriesLessonsPages.add(lesson.attr("abs:href"));
-                }
-                Element nextPage = doc.selectFirst("a.page-link[rel=\"next\"]");
-                if (nextPage != null) {
-                    currentURL = nextPage.attr("abs:href");
-                } else {
-                    System.out.println("completed");
-                    currentURL = null;
-                }
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            JSONObject jsonResponse = new JSONObject(response.body());
+
+            if (jsonResponse.has("metadata")) {
+                String seriesTitle = jsonResponse.getJSONObject("metadata").optString("title", "بدون عنوان");
+//                System.out.println("اسم السلسلة: " + seriesTitle);
+                Pattern pattern = Pattern.compile("الشيخ.\\s*إيهاب الشريف");
+                Matcher m = pattern.matcher(seriesTitle);
+                seriesTitle = m.replaceAll("").trim();
+                series.setName(seriesTitle);
+            bot.getSilent().send("اسم السلسلة : " + seriesTitle, chatId);
             }
-            bot.getSilent().send("اسم السلسلة : " + series.getName(), chatId);
 //            if (bot.getDb().getMap(TelegramBot.dataBases.SERIES.name()).containsKey(series.getName())){
 //                return ;
 //            }
 
-            try (ExecutorService executor = Executors.newFixedThreadPool(seriesLessonsPages.size())) {
+            if (jsonResponse.has("files")) {
+                JSONArray files = jsonResponse.getJSONArray("files");
+                for (int i = 0; i < files.length(); i++) {
+                    JSONObject file = files.getJSONObject(i);
+                    String fileName = file.getString("name");
 
-                Lesson.count = 0;
-                for (int j = 0; j < seriesLessonsPages.size(); j++) {
-                    int finalJ = j;
-                    executor.submit(() -> {
-                        try {
-                            // جلب صفحة الدرس مع تحديد User-Agent و Timeout لتفادي التعليق
-                            Document lessonDoc = Jsoup.connect(seriesLessonsPages.get(finalJ))
-                                    .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                                    .timeout(100000)
-                                    .get();
+                    // فلترة للملفات الصوتية (أو mp4 للفيديو)
+                    if (fileName.endsWith(".mp3")) {
 
-                            Elements downloadLinks = lessonDoc.select("a.btn.downlod");
+                        // 💡 استخراج العنوان (لو مش موجود هناخد اسم الملف نفسه)
+                        String lessonTitle = file.has("title") ? file.getString("title") : fileName.replace(".mp3", "");
+                        Pattern pattern = Pattern.compile("الشيخ.\\s*إيهاب الشريف");
+                        Matcher m = pattern.matcher(lessonTitle);
+                        lessonTitle = m.replaceAll("").trim();
+                        // تكوين الرابط المباشر
+                        String encodedFileName = fileName.replace(" ", "%20");
+                        String directLink = currentURL.replace("details","download") + "/" + encodedFileName;
 
-                            // التحقق من وجود العنصر الثاني لتفادي IndexOutOfBoundsException
-                            Element link = downloadLinks.getLast();
-                            String finalDownloadUrl = link.attr("abs:href");
-                            String title = lessonDoc.title().replace(" - موقع أنا السلفي", "").replace(series.getName(),"").replace("الشيخ إيهاب الشريف", "").trim();
-                            if (title.length() < 5){
-                                title += "الحلقة";
-                            }
-//                            Matcher m = Pattern.compile("\\d+-").matcher(title);
-//                            title = m.replaceAll("").trim();
-                            Lesson lesson = new Lesson(title, finalDownloadUrl);
-                            lesson.setId(finalJ);
-                            series.addLesson(lesson);
-                            bot.getSilent().send("تم " + Lesson.count + " / " + seriesLessonsPages.size(), chatId);
-
-
-                        } catch (Exception e) {
-                            System.err.println("err " + seriesLessonsPages.get(finalJ) + " reson " + e.getMessage());
-                            bot.getSilent().send("تعذر الوصول الى الدرس" + seriesLessonsPages.get(finalJ), chatId);
-                        }
-                    });
+                        // إضافة الدرس للقائمة
+                        series.addLesson(new Lesson(lessonTitle, directLink));
+                        System.out.println(directLink);
+                        System.out.println(lessonTitle);
+                    }
                 }
-                executor.shutdown();
             }
             System.out.println("after" + series);
             return series;

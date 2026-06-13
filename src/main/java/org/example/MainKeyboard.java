@@ -22,8 +22,18 @@ public class MainKeyboard {
     public static ReplyKeyboardMarkup getAllSeries() {
         List<KeyboardRow> rows = new ArrayList<>();
         List<Series> temp = new ArrayList<>(TelegramBot.series.values());
+        rows.add(new KeyboardRow());
+        int rowNum = 0;
         for (int i = 0; i < TelegramBot.series.size(); i++) {
-            rows.add(new KeyboardRow(temp.get(i).getName()));
+            rows.get(rowNum).add(temp.get(i).getName());
+            if (i %3 == 0 && i >0) {
+                rows.add(new KeyboardRow());
+                rowNum++;
+            }
+            if ((i)%2 == 0){
+                rows.add(new KeyboardRow());
+                rowNum++;
+            }
         }
         rows.add(new KeyboardRow("العودة"));
         return ReplyKeyboardMarkup.builder()

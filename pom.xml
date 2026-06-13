@@ -13,6 +13,11 @@
             <artifactId>telegrambots-abilities</artifactId>
             <version>9.5.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20231013</version>
+        </dependency>
         <!-- Source: https://mvnrepository.com/artifact/org.jsoup/jsoup -->
         <dependency>
             <groupId>org.jsoup</groupId>

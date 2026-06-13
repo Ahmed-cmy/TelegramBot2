@@ -16,14 +16,6 @@ public class Main {
     public static void main(String[] args) throws IOException {
 //        final String token = "8696997537:AAGA0VA0_sPc1YSBB2l_7Uw5AQBihO-PuS0";
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(7860), 0);
-        server.createContext("/", exchange -> {
-            String response = "Bot is Running Successfully!";
-            exchange.sendResponseHeaders(200, response.length());
-            exchange.getResponseBody().write(response.getBytes());
-            exchange.getResponseBody().close();
-        });
-        server.start();
         System.out.println("Web server started on port 7860");
 
 

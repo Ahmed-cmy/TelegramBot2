@@ -24,7 +24,11 @@ public class TelegramBot extends AbilityBot {
         adminAction = db.getMap(dataBases.ADMIN_ACTIONS.name());
         silent.send("start", 1784824244L);
         series = db.getMap(dataBases.SERIES.name());
+//        db.clear();
+//        series.clear();
+//        db.getMap(dataBases.ADMIN_ACTIONS.name()).clear();
         db.commit();
+//        db.getMap(TelegramBot.dataBases.NORMAL_USERS.name()).clear();
     }
     public AbilityExtension MainMenu(){
         return new MainMenu();

@@ -15,14 +15,18 @@ public class Series implements Serializable {
     public static int numberOfSeries = 0;
     private final int id;
     private String name;
+    public int page = 1;
+    public int maxPages;
     private final SeriesMap lessons = new SeriesMap();
 
     public Series(String name) {
         this.name = name;
+        Lesson.count = 0;
         id = numberOfSeries++;
     }
 
     public Series() {
+        Lesson.count = 0;
         id = numberOfSeries++;
     }
 
@@ -54,7 +58,14 @@ public class Series implements Serializable {
     }
 
     public void addLesson(Lesson lesson) {
+        maxPages = getLessons().size()/20+1;
         getLessons().addLesson(lesson);
+    }
+    public void addLessonIfAbsent(Lesson lesson) {
+        maxPages = getLessons().size()/20+1;
+        if (!getLessons().getLessonsMap().containsKey(lesson.getName())){
+        getLessons().addLesson(lesson);
+        }
     }
 
     public boolean containsId(int i){
@@ -65,15 +76,23 @@ public class Series implements Serializable {
         List<KeyboardRow> rows = new ArrayList<>();
         int rowNumber = 0;
         rows.add(new KeyboardRow());
-        for (int i = 0; i < getLessons().size(); i++) {
-            if (lessons.size() == 0) {
-                break;
-            }
+//        System.out.println(page);
+        for (int i = (page-1)*20; i < (Math.min(page * 20, getLessons().size())); i++) {
             if (i % 2 == 0 && i > 0) {
                 rowNumber++;
                 rows.add(new KeyboardRow());
             }
+//            System.out.println(page);
+//            System.out.println(getLessons().size() + "|" + i);
             rows.get(rowNumber).add(lessons.getLesson(i).getName());
+        }
+        if (page >= 1 && page < getLessons().size()/20+1)
+        {
+        rows.add(new KeyboardRow("الصفحة التالية"));
+        }
+        if (page > 1)
+        {
+        rows.add(new KeyboardRow("الصفحة السابقة"));
         }
         rows.add(new KeyboardRow("العودة للسلاسل"));
 

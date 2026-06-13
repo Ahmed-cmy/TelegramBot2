@@ -12,13 +12,13 @@ public class Lesson implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     private String name;
-    private String link;
+    private String voiceLink;
     private int id;
     public static int count = 0;
 
-    public Lesson(String name, String link) {
+    public Lesson(String name, String voiceLink) {
         this.name = name;
-        this.link = link;
+        this.voiceLink = voiceLink;
         id = count++;
     }
 
@@ -30,8 +30,8 @@ public class Lesson implements Serializable {
         this.name = name;
     }
 
-    public String getLink() {
-        return link;
+    public String getVoiceLink() {
+        return voiceLink;
     }
 
     public int getId() {
@@ -42,8 +42,8 @@ public class Lesson implements Serializable {
         this.id = id;
     }
 
-    public void setLink(String link) {
-        this.link = link;
+    public void setVoiceLink(String voiceLink) {
+        this.voiceLink = voiceLink;
     }
     public ReplyKeyboardMarkup getKeyboard(){
         List<KeyboardRow> rows = new ArrayList<>();

@@ -114,8 +114,6 @@ public class RemoveSeries implements AbilityExtension {
             }
 
             db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId).getSeries());
-            adminAction.remove(chatId);
-            db.commit();
 
             bot.getSilent().execute(
                     SendMessage.builder()
@@ -124,6 +122,8 @@ public class RemoveSeries implements AbilityExtension {
                             .replyMarkup(MainKeyboard.getMainKeyboard())
                             .build()
             );
+            adminAction.remove(chatId);
+            db.commit();
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantDelete);
     }
 
