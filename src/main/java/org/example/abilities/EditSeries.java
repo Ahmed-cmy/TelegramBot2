@@ -38,7 +38,8 @@ public class EditSeries implements AbilityExtension {
                     adminAction = TelegramBot.adminAction;
                     series = TelegramBot.series;
                     AdminUser currentUser = new AdminUser(ctx.chatId(), AdminUser.userActions.EDIT);
-                    currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+                    currentUser.states.push(AdminUser.editStates.BASE);
+                    currentUser.states.push(AdminUser.editStates.SERIES_SELECT);
                     adminAction.put(ctx.chatId(), currentUser);
                     db.commit();
 
@@ -64,76 +65,148 @@ public class EditSeries implements AbilityExtension {
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             AdminUser currentUser = adminAction.get(chatId);
-            System.out.println(currentUser.states.toString());
-//            System.out.println(currentUser.states.search(AdminUser.editStates.EDIT_TYPE));
-
-            if (currentUser.states.search(AdminUser.editStates.SERIES_SELECT) == 1) {
-                bot.getSilent().execute(
-                        SendMessage.builder()
-                                .text("يرجى اختيار سلسلة للتعديل")
-                                .chatId(chatId)
-                                .replyMarkup(MainKeyboard.getAllSeries())
-                                .build()
-                );
-                currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+            if (message.equals("العودة")) {
+                currentUser.states.pop();
                 adminAction.put(chatId, currentUser);
                 db.commit();
-                return;
+//                return;
             }
-            if (currentUser.states.search(AdminUser.editStates.EDIT_TYPE) == 1) {
-                if (!series.containsKey(message)) {
-                    bot.getSilent().send("تحقق من اسم السلسلة", chatId);
-                    return;
-                }
-                currentUser.setSeries(message);
-                adminAction.put(chatId, currentUser);
-                currentUser.states.push(AdminUser.editStates.CHECK_EDIT_TYPE);
-                db.commit();
-                System.out.println("working");
-
-                List<KeyboardRow> rows = new ArrayList<>();
-                rows.add(new KeyboardRow("إضافة درس/دروس", "حذف درس", "تعديل درس"));
-                rows.add(new KeyboardRow("العودة"));
-
+            if (message.equals("الخروج من وضع التعديل")) {
+                currentUser.states.clear();
                 bot.getSilent().execute(
                         SendMessage.builder()
-                                .text("اختر")
                                 .chatId(chatId)
-                                .replyMarkup(ReplyKeyboardMarkup.builder()
-                                        .keyboard(rows)
-                                        .resizeKeyboard(true)
-                                        .build())
+                                .text("تم الإلغاء")
+                                .replyMarkup(MainKeyboard.getMainKeyboard())
                                 .build()
                 );
-
                 return;
             }
-            if (currentUser.states.search(AdminUser.editStates.EDIT_TYPE) != -1) {
-                switch (message) {
-                    case "إضافة درس/دروس":
+            switch (currentUser.states.peek()) {
+                case AdminUser.editStates.BASE:
+                    bot.getSilent().execute(
+                            SendMessage.builder()
+                                    .text("يرجى اختيار سلسلة للتعديل")
+                                    .chatId(chatId)
+                                    .replyMarkup(MainKeyboard.getAllSeries())
+                                    .build()
+                    );
+                    currentUser.states.push(AdminUser.editStates.SERIES_SELECT);
+                    adminAction.put(chatId, currentUser);
+                    db.commit();
+                    break;
+                case AdminUser.editStates.SERIES_SELECT:
+                    if (currentUser.getSeries().isEmpty()) {
+
+                        if (!series.containsKey(message)) {
+                            bot.getSilent().send("تحقق من اسم السلسلة", chatId);
+                            break;
+                        }
+                        currentUser.setSeries(message);
+                        currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+                        adminAction.put(chatId, currentUser);
+                        db.commit();
+
+//                    System.out.println("working");
+
+                        List<KeyboardRow> rows = new ArrayList<>();
+                        rows.add(new KeyboardRow("إضافة درس/دروس", "حذف درس", "تعديل درس"));
+                        rows.add(new KeyboardRow("العودة"));
+
                         bot.getSilent().execute(
                                 SendMessage.builder()
-                                        .text("اكتب اسم الدرس ثم , ثم link")
+                                        .text("اختر")
+                                        .chatId(chatId)
                                         .replyMarkup(ReplyKeyboardMarkup.builder()
-                                                .keyboardRow(new KeyboardRow("العودة"))
+                                                .keyboard(rows)
                                                 .resizeKeyboard(true)
                                                 .build())
                                         .build()
                         );
-                        currentUser.states.push(AdminUser.editStates.ADD_LESSONS);
-                        adminAction.put(chatId, currentUser);
-                        db.commit();
-                        break;
+                    }
+                    break;
+                case AdminUser.editStates.EDIT_TYPE:
+                    System.out.println("out");
+                    switch (message) {
+                        case "إضافة درس/دروس":
+                            System.out.println("in");
+                            bot.getSilent().execute(
+                                    SendMessage.builder()
+                                            .text("اكتب اسم الدرس ثم , ثم link")
+                                            .replyMarkup(ReplyKeyboardMarkup.builder()
+                                                    .keyboardRow(new KeyboardRow("العودة"))
+                                                    .resizeKeyboard(true)
+                                                    .build())
+                                            .build()
+                            );
+                            currentUser.states.push(AdminUser.editStates.ADD_LESSONS);
+                            adminAction.put(chatId, currentUser);
+                            db.commit();
+                            break;
 
-                    case "حذف درس":
-                        break;
+                        case "حذف درس":
+                            break;
 
-                    case "تعديل درس":
-                        break;
-                    default:
-                        bot.getSilent().send("اختيار خاطئ", chatId);
-                }
+                        case "تعديل درس":
+                            System.out.println("in edit");
+                            try {
+                                bot.getSilent().execute(
+                                        SendMessage.builder()
+                                                .text("اختر درس للتعديل")
+                                                .chatId(chatId)
+                                                .replyMarkup(series.get(currentUser.getSeries()).getKeyboard())
+                                                .build()
+                                );
+                                currentUser.states.push(AdminUser.editStates.SELECT_LESSON);
+                                adminAction.put(chatId, currentUser);
+                                db.commit();
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                            return;
+                        default:
+                            bot.getSilent().send("اختيار خاطئ", chatId);
+                    }
+                case AdminUser.editStates.SELECT_LESSON:
+                    System.out.println("message" + message);
+                    currentUser.setLesson(message);
+                    currentUser.states.push(AdminUser.editStates.EDIT_LESSON);
+                    adminAction.put(chatId, currentUser);
+                    db.commit();
+                    bot.getSilent().execute(
+                            SendMessage.builder()
+                                    .text("السطر ألأول للعنوان و الثاني للرابط" + "\n" +
+                                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).getName() + "\n" +
+                                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).getVoiceLink())
+                                    .chatId(chatId)
+                                    .build()
+                    );
+                    break;
+                case AdminUser.editStates.EDIT_LESSON:
+                    System.out.println(currentUser.getLesson());
+                    try {
+
+                        Scanner scanner = new Scanner(message);
+                        String[] lessonData = message.split("\\n");
+                        if (scanner.hasNextLine() && lessonData.length != 2) {
+                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).setName(lessonData[0]);
+                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).setVoiceLink(lessonData[1]);
+                            db.commit();
+                            bot.getSilent().send("تم", chatId);
+                            return;
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+                default:
+
             }
+            System.out.println("s: " + currentUser.states.toString());
+
+//            System.out.println(currentUser.states.search(AdminUser.editStates.EDIT_TYPE));
 
 
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantEdit);

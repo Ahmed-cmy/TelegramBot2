@@ -39,7 +39,7 @@ public class SeriesMap implements Serializable {
         List<Lesson> values = new ArrayList<>(lessons.values());
         for (int i = 0; i < lessons.size(); i++) {
             lessonsByName.put(lessonsById.get(i).getName(),lessonsById.get(i));
-            System.out.println(lessonsById.get(i).getName());
+//            System.out.println(lessonsById.get(i).getName());
         }
     }
 

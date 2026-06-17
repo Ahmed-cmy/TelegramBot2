@@ -34,7 +34,7 @@ public class LinkLocator implements AbilityExtension {
         Series series = new Series();
 //        Series series = new Series();
         List<String> seriesLessonsPages = new ArrayList<>();
-        System.out.println("currentURL" + currentURL);
+//        System.out.println("currentURL" + currentURL);
         try {
             while (currentURL != null && !currentURL.isEmpty()) {
                 Document doc = Jsoup.connect(currentURL).get();
@@ -50,7 +50,7 @@ public class LinkLocator implements AbilityExtension {
                 if (nextPage != null) {
                     currentURL = nextPage.attr("abs:href");
                 } else {
-                    System.out.println("completed");
+//                    System.out.println("completed");
                     currentURL = null;
                 }
             }
@@ -97,7 +97,7 @@ public class LinkLocator implements AbilityExtension {
                 }
                 executor.shutdown();
             }
-            System.out.println("after" + series);
+//            System.out.println("after" + series);
             return series;
         } catch (Exception e) {
             e.printStackTrace();

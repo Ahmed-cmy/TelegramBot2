@@ -37,13 +37,17 @@ public class TelegramBot extends AbilityBot {
     public AbilityExtension addSeries() {
         return new AddSeries(this);
     }
+    public AbilityExtension welcomeMessage() {
+        return new Welcome();
+    }
+
 
     public AbilityExtension removeSeries() {
         return new RemoveSeries(this);
     }
-    public AbilityExtension editSeries() {
-        return new EditSeries(this);
-    }
+//    public AbilityExtension editSeries() {
+//        return new EditSeries(this);
+//    }
     public AbilityExtension linkLocator(){
         return new LinkLocator(this);
     }

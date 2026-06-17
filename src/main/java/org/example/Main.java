@@ -16,7 +16,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
 //        final String token = "8696997537:AAGA0VA0_sPc1YSBB2l_7Uw5AQBihO-PuS0";
 
-        System.out.println("Web server started on port 7860");
+//        System.out.println("Web server started on port 7860");
 
 
         Dotenv Token = Dotenv.load();

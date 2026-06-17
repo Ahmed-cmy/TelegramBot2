@@ -82,6 +82,8 @@ public class AdminUser implements Serializable {
         EDIT_TYPE,
         CHECK_EDIT_TYPE,
         ADD_LESSONS,
+        EDIT_LESSON,
+        SELECT_LESSON
     }
 
     public static enum userActions {

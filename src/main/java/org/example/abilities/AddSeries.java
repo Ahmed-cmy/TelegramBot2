@@ -106,7 +106,7 @@ public class AddSeries implements AbilityExtension {
                     adminAction.remove(chatId);
                     db.commit();
 //                    System.out.println(series.getLesson(series.getLesson(0).getName()).getKeyboard());
-                    System.out.println(db.getMap(dataBases.SERIES.name()).get(series.getName()));
+//                    System.out.println(db.getMap(dataBases.SERIES.name()).get(series.getName()));
                 } else {
                     bot.getSilent().send("فشل حاول مره أخرى", chatId);
                 }
