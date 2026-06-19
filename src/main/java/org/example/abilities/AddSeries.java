@@ -2,6 +2,9 @@ package org.example.abilities;
 
 
 import org.example.*;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -12,6 +15,8 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.telegram.telegrambots.abilitybots.api.objects.Locality.ALL;
 import static org.telegram.telegrambots.abilitybots.api.objects.Privacy.ADMIN;
@@ -140,27 +145,56 @@ public class AddSeries implements AbilityExtension {
                 }
             } else {
                 try {
+                    // loading message
 
-                    Scanner scanner = new Scanner(message);
-                    String name = scanner.nextLine();
-                    String firstink = scanner.nextLine();
-                    int len = scanner.nextInt();
-                    String linkPattern = firstink.substring(0, firstink.lastIndexOf("/") + 1);
-                    int firstId = Integer.parseInt(firstink.substring(firstink.lastIndexOf("/") + 1));
-                    int currentId = firstId;
+                    // separate message into lines
+                    String[] messageLines = message.split("\\n");
 
-                    System.out.println(
-                            "name:  " + name +
-                                    "\nfirstLink:     " + firstink +
-                                    "\nlen:   " + len +
-                                    "\npattern:   " + linkPattern+
-                                    "\nfirstId:   " + firstId
-                    );
+                    // validate series input
+                    if (message.split("\\n").length != 3){
+                        bot.getSilent().send("تأكد من الصياغة", chatId);
+                        return;
+                    }
+
+                    bot.getSilent().send("جاري التحميل", chatId);
+
+                    String name = messageLines[0];
+                    String firstLink = messageLines[1];
+                    int len = Integer.parseInt(messageLines[2]);
+
+                    String linkPattern = firstLink.substring(0, firstLink.lastIndexOf("/") + 1);
+
+                    // get the first message id from first link
+                    int firstId = Integer.parseInt(firstLink.substring(firstLink.lastIndexOf("/") + 1));
+//                    int currentId = firstId; //used in loop
 
                     Series series = new Series(name);
+
                     for (int i = firstId; i < len+firstId; i++) {
-                        series.addLesson(new Lesson("الحلقة: " + (i - firstId + 1), linkPattern + currentId));
-                        currentId++;
+
+                        String title = "الحلقة: " + (i - firstId + 1);
+                        try {
+                            // Connect and download the HTML
+                            Document doc = Jsoup.connect(linkPattern + i).get();
+                            // Find the specific text class
+                            Element messageElement = doc.selectFirst("meta[property=og:description]");
+                            if (messageElement != null) {
+                                title = messageElement.attr("content").split("\\n")[1];
+                                Pattern pattern = Pattern.compile("الشيخ\\s*.\\s*إيهاب الشريف");
+                                Matcher m = pattern.matcher(title);
+                                title = m.replaceAll("").trim();
+                            } else {
+                                System.out.println("Message not found or text is empty.");
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        series.addLesson(new Lesson(title, linkPattern + i));
+
+
+
+//                        currentId++;
                     }
                     bot.getSilent().execute(
                             SendMessage.builder()
@@ -172,7 +206,6 @@ public class AddSeries implements AbilityExtension {
                     db.getMap(dataBases.SERIES.name()).put(series.getName(), series);
                     adminAction.remove(chatId);
                     db.commit();
-                    bot.getSilent().send("done", chatId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

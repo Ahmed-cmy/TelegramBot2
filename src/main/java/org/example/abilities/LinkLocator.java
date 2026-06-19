@@ -65,7 +65,7 @@ public class LinkLocator implements AbilityExtension {
 
                         // 💡 استخراج العنوان (لو مش موجود هناخد اسم الملف نفسه)
                         String lessonTitle = file.has("title") ? file.getString("title") : fileName.replace(".mp3", "");
-                        Pattern pattern = Pattern.compile("الشيخ.\\s*إيهاب الشريف");
+                        Pattern pattern = Pattern.compile("الشيخ\\s*.\\s*إيهاب الشريف");
                         Matcher m = pattern.matcher(lessonTitle);
                         lessonTitle = m.replaceAll("").trim();
                         // تكوين الرابط المباشر
