@@ -4,29 +4,11 @@ import org.example.Lesson;
 import org.example.MainKeyboard;
 import org.example.NormalUser;
 import org.example.TelegramBot;
-import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
-import org.telegram.telegrambots.abilitybots.api.bot.BaseAbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Reply;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
-import org.telegram.telegrambots.meta.api.methods.send.SendAudio;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardRow;
-
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -52,7 +34,6 @@ public class MainMenu implements AbilityExtension {
         return Reply.of((bot, update) -> {
             db = bot.getDb();
             NormalUsersMap = db.getMap(TelegramBot.dataBases.NORMAL_USERS.name());
-//            db.getMap(TelegramBot.dataBases.NORMAL_USERS.name()).clear();
 
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
@@ -124,7 +105,6 @@ public class MainMenu implements AbilityExtension {
                                 break;
                             }
                             currentUser.setLesson(currentUser.getSeries().getLesson(message));
-//                        System.out.println(currentUser.getSeries().getLessons().getLesson(message).getName());
 
                             currentUser.setKeyboardMarkup(currentUser.getSeries().getLesson(message).getKeyboard());
                             NormalUsersMap.put(chatId, currentUser);
@@ -136,13 +116,8 @@ public class MainMenu implements AbilityExtension {
 
                                 Lesson lesson = currentUser.getSeries().getLesson(currentUser.getLesson().getName());
                                 if (message.equals("صوتي")) {
-//                                    System.out.println(new InputFile(lesson.getVoiceLink()));
-
-//                                sendLessonAudio(currentUser,bot);
                                     try {
-                                        System.out.println("try 1");
                                         bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getVoiceLink() + ")", chatId);
-//                                        System.out.println(lesson.getVoiceLink());
                                     } catch (Exception e) {
                                         bot.getSilent().send("حدث خطأ", chatId);
                                     }

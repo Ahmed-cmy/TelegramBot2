@@ -107,7 +107,6 @@ public class EditSeries implements AbilityExtension {
                         adminAction.put(chatId, currentUser);
                         db.commit();
 
-//                    System.out.println("working");
 
                         List<KeyboardRow> rows = new ArrayList<>();
                         rows.add(new KeyboardRow("إضافة درس/دروس", "حذف درس", "تعديل درس"));
@@ -206,7 +205,6 @@ public class EditSeries implements AbilityExtension {
             }
             System.out.println("s: " + currentUser.states.toString());
 
-//            System.out.println(currentUser.states.search(AdminUser.AdminStates.EDIT_TYPE));
 
 
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantEdit);

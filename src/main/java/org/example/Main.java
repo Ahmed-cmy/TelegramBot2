@@ -25,7 +25,6 @@ public class Main {
             TelegramClient client = new OkHttpTelegramClient(token);
             botApp.registerBot(token,new TelegramBot(client, "Sh_Ihab_bot"));
             System.out.println("success");
-//            LinkLocator.seriesGetter("https://anasalafy.com/ar/category/%D8%AC%D8%B3%D8%B1-%D8%A7%D9%84%D8%AA%D8%B9%D8%A8?sortBy=date-asc");
             Thread.currentThread().join();
         } catch (Exception e) {
             e.printStackTrace();

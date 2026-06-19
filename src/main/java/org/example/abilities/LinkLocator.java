@@ -28,17 +28,13 @@ import java.util.regex.Pattern;
 
 public class LinkLocator implements AbilityExtension {
     private static AbilityBot bot;
-//    private DBContext db;
 
     public LinkLocator(AbilityBot bot) {
-        this.bot = bot;
-//        db = bot.getDb();
+        LinkLocator.bot = bot;
     }
 
     public static Series seriesGetter(String currentURL, long chatId) throws Exception {
         Series series = new Series();
-        List<String> seriesLessonsPages = new ArrayList<>();
-//        System.out.println("currentURL" + currentURL);
         try {
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
@@ -51,16 +47,12 @@ public class LinkLocator implements AbilityExtension {
 
             if (jsonResponse.has("metadata")) {
                 String seriesTitle = jsonResponse.getJSONObject("metadata").optString("title", "بدون عنوان");
-//                System.out.println("اسم السلسلة: " + seriesTitle);
                 Pattern pattern = Pattern.compile("الشيخ.\\s*إيهاب الشريف");
                 Matcher m = pattern.matcher(seriesTitle);
                 seriesTitle = m.replaceAll("").trim();
                 series.setName(seriesTitle);
             bot.getSilent().send("اسم السلسلة : " + seriesTitle, chatId);
             }
-//            if (bot.getDb().getMap(TelegramBot.dataBases.SERIES.name()).containsKey(series.getName())){
-//                return ;
-//            }
 
             if (jsonResponse.has("files")) {
                 JSONArray files = jsonResponse.getJSONArray("files");
@@ -82,8 +74,6 @@ public class LinkLocator implements AbilityExtension {
 
                         // إضافة الدرس للقائمة
                         series.addLesson(new Lesson(lessonTitle, directLink));
-//                        System.out.println(directLink);
-//                        System.out.println(lessonTitle);
                     }
                 }
             }

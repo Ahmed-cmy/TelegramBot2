@@ -72,7 +72,6 @@ public class AddSeries implements AbilityExtension {
             long chatId = update.getMessage().getChatId();
             AdminUser currentUser = adminAction.get(chatId);
             String message = update.getMessage().getText();
-            String seriesName = adminAction.get(chatId).getSeries();
 
             if (message.equals("إلغاء")) {
                 adminAction.remove(chatId);
@@ -119,7 +118,6 @@ public class AddSeries implements AbilityExtension {
                 Series series = null;
                 try {
                     series = LinkLocator.seriesGetter(message, chatId);
-//                System.out.println(series);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -136,8 +134,6 @@ public class AddSeries implements AbilityExtension {
                         db.getMap(dataBases.SERIES.name()).put(series.getName(), series);
                         adminAction.remove(chatId);
                         db.commit();
-//                    System.out.println(series.getLesson(series.getLesson(0).getName()).getKeyboard());
-//                    System.out.println(db.getMap(dataBases.SERIES.name()).get(series.getName()));
                     } else {
                         bot.getSilent().send("فشل حاول مره أخرى", chatId);
                     }
@@ -164,9 +160,7 @@ public class AddSeries implements AbilityExtension {
                     Series series = new Series(name);
                     for (int i = firstId; i < len+firstId; i++) {
                         series.addLesson(new Lesson("الحلقة: " + (i - firstId + 1), linkPattern + currentId));
-//                        bot.getSilent().send(linkPattern + currentId, chatId);
                         currentId++;
-//                        System.out.println(series.getLesson(i-firstId));
                     }
                     bot.getSilent().execute(
                             SendMessage.builder()
