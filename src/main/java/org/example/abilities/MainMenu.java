@@ -136,18 +136,13 @@ public class MainMenu implements AbilityExtension {
 
                                 Lesson lesson = currentUser.getSeries().getLesson(currentUser.getLesson().getName());
                                 if (message.equals("صوتي")) {
-                                    System.out.println(new InputFile(lesson.getVoiceLink()));
+//                                    System.out.println(new InputFile(lesson.getVoiceLink()));
 
 //                                sendLessonAudio(currentUser,bot);
                                     try {
                                         System.out.println("try 1");
-//                                bot.getSilent().execute(
-//                                        SendMessage.builder()
-//                                                .chatId(chatId)
-//                                                .text()
-//                                                .build()
-//                                );
-                                        bot.getSilent().sendMd("[" + lesson.getName() + "](" + getFinalDirectUrl(lesson.getVoiceLink()) + ")", chatId);
+                                        bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getVoiceLink() + ")", chatId);
+//                                        System.out.println(lesson.getVoiceLink());
                                     } catch (Exception e) {
                                         bot.getSilent().send("حدث خطأ", chatId);
                                     }
@@ -220,39 +215,39 @@ public class MainMenu implements AbilityExtension {
 //            bot.getSilent().send("الدرس: " + lessonTitle + "\nالرابط: " + audioUrl, chatId);
 //        }
 //    }
-    public String getFinalDirectUrl(String originalUrl) {
-        try {
-            URL url = new URL(originalUrl);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-            // نمنع الجافا من تتبع التحويل تلقائياً عشان نمسكه إحنا
-            connection.setInstanceFollowRedirects(false);
-            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
-
-            // جلب كود حالة الرد
-            int status = connection.getResponseCode();
-
-            // لو الرد فيه تحويل (301, 302, 303)
-            if (status == HttpURLConnection.HTTP_MOVED_TEMP
-                    || status == HttpURLConnection.HTTP_MOVED_PERM
-                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
-
-                // نجيب الرابط الجديد من الهيدر
-                String redirectUrl = connection.getHeaderField("Location");
-
-                // لو الرابط ناقص بروتوكول نكملة
-                if (redirectUrl.startsWith("/")) {
-                    redirectUrl = "https://archive.org" + redirectUrl;
-                } else if (redirectUrl.startsWith("http://")) {
-                    // تليجرام بيفضل https
-                    redirectUrl = redirectUrl.replace("http://", "https://");
-                }
-                System.out.println(redirectUrl);
-                return redirectUrl; // ده الرابط المباشر النهائي لسيرفر الملف!
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return originalUrl; // لو مفيش تحويل، نرجع الرابط الأصلي
-    }
+//    public String getFinalDirectUrl(String originalUrl) {
+//        try {
+//            URL url = new URL(originalUrl);
+//            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+//
+//            // نمنع الجافا من تتبع التحويل تلقائياً عشان نمسكه إحنا
+//            connection.setInstanceFollowRedirects(false);
+//            connection.setRequestProperty("User-Agent", "Mozilla/5.0");
+//
+//            // جلب كود حالة الرد
+//            int status = connection.getResponseCode();
+//
+//            // لو الرد فيه تحويل (301, 302, 303)
+//            if (status == HttpURLConnection.HTTP_MOVED_TEMP
+//                    || status == HttpURLConnection.HTTP_MOVED_PERM
+//                    || status == HttpURLConnection.HTTP_SEE_OTHER) {
+//
+//                // نجيب الرابط الجديد من الهيدر
+//                String redirectUrl = connection.getHeaderField("Location");
+//
+//                // لو الرابط ناقص بروتوكول نكملة
+//                if (redirectUrl.startsWith("/")) {
+//                    redirectUrl = "https://archive.org" + redirectUrl;
+//                } else if (redirectUrl.startsWith("http://")) {
+//                    // تليجرام بيفضل https
+//                    redirectUrl = redirectUrl.replace("http://", "https://");
+//                }
+//                System.out.println(redirectUrl);
+//                return redirectUrl; // ده الرابط المباشر النهائي لسيرفر الملف!
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return originalUrl; // لو مفيش تحويل، نرجع الرابط الأصلي
+//    }
 }

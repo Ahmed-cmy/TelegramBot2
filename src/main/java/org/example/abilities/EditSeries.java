@@ -38,8 +38,8 @@ public class EditSeries implements AbilityExtension {
                     adminAction = TelegramBot.adminAction;
                     series = TelegramBot.series;
                     AdminUser currentUser = new AdminUser(ctx.chatId(), AdminUser.userActions.EDIT);
-                    currentUser.states.push(AdminUser.editStates.BASE);
-                    currentUser.states.push(AdminUser.editStates.SERIES_SELECT);
+                    currentUser.states.push(AdminUser.AdminStates.BASE);
+                    currentUser.states.push(AdminUser.AdminStates.SERIES_SELECT);
                     adminAction.put(ctx.chatId(), currentUser);
                     db.commit();
 
@@ -83,7 +83,7 @@ public class EditSeries implements AbilityExtension {
                 return;
             }
             switch (currentUser.states.peek()) {
-                case AdminUser.editStates.BASE:
+                case AdminUser.AdminStates.BASE:
                     bot.getSilent().execute(
                             SendMessage.builder()
                                     .text("يرجى اختيار سلسلة للتعديل")
@@ -91,11 +91,11 @@ public class EditSeries implements AbilityExtension {
                                     .replyMarkup(MainKeyboard.getAllSeries())
                                     .build()
                     );
-                    currentUser.states.push(AdminUser.editStates.SERIES_SELECT);
+                    currentUser.states.push(AdminUser.AdminStates.SERIES_SELECT);
                     adminAction.put(chatId, currentUser);
                     db.commit();
                     break;
-                case AdminUser.editStates.SERIES_SELECT:
+                case AdminUser.AdminStates.SERIES_SELECT:
                     if (currentUser.getSeries().isEmpty()) {
 
                         if (!series.containsKey(message)) {
@@ -103,7 +103,7 @@ public class EditSeries implements AbilityExtension {
                             break;
                         }
                         currentUser.setSeries(message);
-                        currentUser.states.push(AdminUser.editStates.EDIT_TYPE);
+                        currentUser.states.push(AdminUser.AdminStates.EDIT_TYPE);
                         adminAction.put(chatId, currentUser);
                         db.commit();
 
@@ -125,7 +125,7 @@ public class EditSeries implements AbilityExtension {
                         );
                     }
                     break;
-                case AdminUser.editStates.EDIT_TYPE:
+                case AdminUser.AdminStates.EDIT_TYPE:
                     System.out.println("out");
                     switch (message) {
                         case "إضافة درس/دروس":
@@ -139,7 +139,7 @@ public class EditSeries implements AbilityExtension {
                                                     .build())
                                             .build()
                             );
-                            currentUser.states.push(AdminUser.editStates.ADD_LESSONS);
+                            currentUser.states.push(AdminUser.AdminStates.ADD_LESSONS);
                             adminAction.put(chatId, currentUser);
                             db.commit();
                             break;
@@ -157,7 +157,7 @@ public class EditSeries implements AbilityExtension {
                                                 .replyMarkup(series.get(currentUser.getSeries()).getKeyboard())
                                                 .build()
                                 );
-                                currentUser.states.push(AdminUser.editStates.SELECT_LESSON);
+                                currentUser.states.push(AdminUser.AdminStates.SELECT_LESSON);
                                 adminAction.put(chatId, currentUser);
                                 db.commit();
                             } catch (Exception e) {
@@ -167,10 +167,10 @@ public class EditSeries implements AbilityExtension {
                         default:
                             bot.getSilent().send("اختيار خاطئ", chatId);
                     }
-                case AdminUser.editStates.SELECT_LESSON:
+                case AdminUser.AdminStates.SELECT_LESSON:
                     System.out.println("message" + message);
                     currentUser.setLesson(message);
-                    currentUser.states.push(AdminUser.editStates.EDIT_LESSON);
+                    currentUser.states.push(AdminUser.AdminStates.EDIT_LESSON);
                     adminAction.put(chatId, currentUser);
                     db.commit();
                     bot.getSilent().execute(
@@ -182,7 +182,7 @@ public class EditSeries implements AbilityExtension {
                                     .build()
                     );
                     break;
-                case AdminUser.editStates.EDIT_LESSON:
+                case AdminUser.AdminStates.EDIT_LESSON:
                     System.out.println(currentUser.getLesson());
                     try {
 
@@ -206,7 +206,7 @@ public class EditSeries implements AbilityExtension {
             }
             System.out.println("s: " + currentUser.states.toString());
 
-//            System.out.println(currentUser.states.search(AdminUser.editStates.EDIT_TYPE));
+//            System.out.println(currentUser.states.search(AdminUser.AdminStates.EDIT_TYPE));
 
 
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantEdit);

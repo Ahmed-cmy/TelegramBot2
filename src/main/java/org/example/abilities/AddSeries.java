@@ -42,9 +42,12 @@ public class AddSeries implements AbilityExtension {
                     adminAction = TelegramBot.adminAction;
                     adminAction.put(ctx.chatId(), new AdminUser(ctx.chatId(), AdminUser.userActions.ADD_SERIES));
                     db.commit();
-                    KeyboardRow row = new KeyboardRow("إلغاء");
+                    List<KeyboardRow> rows = new ArrayList<>();
+                    rows.add(new KeyboardRow("Internet archive"));
+                    rows.add(new KeyboardRow("Channel"));
+                    rows.add(new KeyboardRow("إلغاء"));
                     ReplyKeyboardMarkup addKeyboard = ReplyKeyboardMarkup.builder()
-                            .keyboardRow(row)
+                            .keyboard(rows)
                             .resizeKeyboard(true)
                             .build();
                     bot.getSilent().execute(
@@ -76,25 +79,95 @@ public class AddSeries implements AbilityExtension {
                 bot.getSilent().send("تم الإلغاء", chatId);
                 return;
             }
-//            System.out.println(seriesName);
-//            if (adminAction.get(chatId).getSeries().isEmpty()) {
-//                currentUser.setSeries(message);
-//                adminAction.put(chatId, currentUser);
-//                db.commit();
-//                bot.getSilent().send("ارسل السلسلة", update.getMessage().getChatId());
-//                return;
-//            }
-            bot.getSilent().send("جاري التحميل", chatId);
-            Series series = null;
-            try {
-                series = LinkLocator.seriesGetter(message, chatId);
+            KeyboardRow row = new KeyboardRow("إلغاء");
+            ReplyKeyboardMarkup addKeyboard = ReplyKeyboardMarkup.builder()
+                    .keyboardRow(row)
+                    .resizeKeyboard(true)
+                    .build();
+            switch (message) {
+                case "Internet archive":
+                    currentUser.states.push(AdminUser.AdminStates.ADD_FROM_INTERNET_ARCHIVE);
+                    adminAction.put(chatId, currentUser);
+                    bot.getSilent().execute(
+                            SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text("اكتب لينك السلسلة للإلغاء اضغط إلغاء")
+                                    .replyMarkup(addKeyboard)
+                                    .build()
+                    );
+                    db.commit();
+                    return;
+                case "Channel":
+                    currentUser.states.push(AdminUser.AdminStates.ADD_FROM_CHANNEL);
+                    adminAction.put(chatId, currentUser);
+                    bot.getSilent().execute(
+                            SendMessage.builder()
+                                    .chatId(chatId)
+                                    .text("اكتب لينك السلسلة للإلغاء اضغط إلغاء")
+                                    .replyMarkup(addKeyboard)
+                                    .build()
+                    );
+                    db.commit();
+                    return;
+                default:
+                    if (currentUser.states.peek() == null) {
+                        bot.getSilent().send("invalid", chatId);
+                    }
+            }
+            if (currentUser.states.peek() == AdminUser.AdminStates.ADD_FROM_INTERNET_ARCHIVE) {
+                bot.getSilent().send("جاري التحميل", chatId);
+                Series series = null;
+                try {
+                    series = LinkLocator.seriesGetter(message, chatId);
 //                System.out.println(series);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
 //                bot.getSilent().send("تم",chatId);
-                if (series != null) {
+                    if (series != null) {
 
+                        bot.getSilent().execute(
+                                SendMessage.builder()
+                                        .text("تم")
+                                        .chatId(chatId)
+                                        .replyMarkup(MainKeyboard.getMainKeyboard())
+                                        .build()
+                        );
+                        db.getMap(dataBases.SERIES.name()).put(series.getName(), series);
+                        adminAction.remove(chatId);
+                        db.commit();
+//                    System.out.println(series.getLesson(series.getLesson(0).getName()).getKeyboard());
+//                    System.out.println(db.getMap(dataBases.SERIES.name()).get(series.getName()));
+                    } else {
+                        bot.getSilent().send("فشل حاول مره أخرى", chatId);
+                    }
+                }
+            } else {
+                try {
+
+                    Scanner scanner = new Scanner(message);
+                    String name = scanner.nextLine();
+                    String firstink = scanner.nextLine();
+                    int len = scanner.nextInt();
+                    String linkPattern = firstink.substring(0, firstink.lastIndexOf("/") + 1);
+                    int firstId = Integer.parseInt(firstink.substring(firstink.lastIndexOf("/") + 1));
+                    int currentId = firstId;
+
+                    System.out.println(
+                            "name:  " + name +
+                                    "\nfirstLink:     " + firstink +
+                                    "\nlen:   " + len +
+                                    "\npattern:   " + linkPattern+
+                                    "\nfirstId:   " + firstId
+                    );
+
+                    Series series = new Series(name);
+                    for (int i = firstId; i < len+firstId; i++) {
+                        series.addLesson(new Lesson("الحلقة: " + (i - firstId + 1), linkPattern + currentId));
+//                        bot.getSilent().send(linkPattern + currentId, chatId);
+                        currentId++;
+//                        System.out.println(series.getLesson(i-firstId));
+                    }
                     bot.getSilent().execute(
                             SendMessage.builder()
                                     .text("تم")
@@ -105,12 +178,12 @@ public class AddSeries implements AbilityExtension {
                     db.getMap(dataBases.SERIES.name()).put(series.getName(), series);
                     adminAction.remove(chatId);
                     db.commit();
-//                    System.out.println(series.getLesson(series.getLesson(0).getName()).getKeyboard());
-//                    System.out.println(db.getMap(dataBases.SERIES.name()).get(series.getName()));
-                } else {
-                    bot.getSilent().send("فشل حاول مره أخرى", chatId);
+                    bot.getSilent().send("done", chatId);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             }
+
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantAdd);
     }
 }

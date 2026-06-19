@@ -8,9 +8,9 @@ import java.util.Stack;
 public class AdminUser implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    public Stack<Enum<editStates>> states = new Stack<>();
+    public Stack<Enum<AdminStates>> states = new Stack<>();
     private Enum<userActions> action;
-    private Enum<editStates> editAction;
+    private Enum<AdminStates> actionType;
     private String series = "";
     private String lesson = "";
     private long chatId;
@@ -20,28 +20,28 @@ public class AdminUser implements Serializable {
         this.action = action;
     }
 
-    public Stack<Enum<editStates>> getStates() {
+    public Stack<Enum<AdminStates>> getStates() {
         return states;
     }
 
-    public void setStates(Stack<Enum<editStates>> states) {
+    public void setStates(Stack<Enum<AdminStates>> states) {
         this.states = states;
     }
 
-    public Enum<editStates> getEditAction() {
-        return editAction;
+    public Enum<AdminStates> getActionType() {
+        return actionType;
     }
 
-    public void setEditAction(Enum<editStates> editAction) {
-        this.editAction = editAction;
+    public void setActionType(Enum<AdminStates> actionType) {
+        this.actionType = actionType;
     }
 
     public boolean checkAction(Enum<userActions> action) {
         return this.action.equals(action);
     }
 
-    public boolean checkEditAction(Enum<editStates> action) {
-        return this.editAction.equals(action);
+    public boolean checkEditAction(Enum<AdminStates> action) {
+        return this.actionType.equals(action);
     }
 
     public Enum<userActions> getAction() {
@@ -76,14 +76,16 @@ public class AdminUser implements Serializable {
         this.chatId = chatId;
     }
 
-    public enum editStates {
+    public enum AdminStates {
         BASE,
         SERIES_SELECT,
         EDIT_TYPE,
         CHECK_EDIT_TYPE,
         ADD_LESSONS,
         EDIT_LESSON,
-        SELECT_LESSON
+        SELECT_LESSON,
+        ADD_FROM_INTERNET_ARCHIVE,
+        ADD_FROM_CHANNEL
     }
 
     public static enum userActions {

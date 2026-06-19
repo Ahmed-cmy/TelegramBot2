@@ -75,23 +75,11 @@ public class RemoveSeries implements AbilityExtension {
                     return;
                 }
 
-                if (message.equals("لا") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(currentUser.getSeries())) {
 
-                    currentUser.setSeries("");
-                    adminAction.put(chatId, currentUser);
-                    db.commit();
-                    bot.getSilent().execute(
-                            SendMessage.builder()
-                                    .text("يرجى اختيار سلسلة للحذف")
-                                    .chatId(chatId)
-                                    .replyMarkup(MainKeyboard.getAllSeries())
-                                    .build()
-                    );
-                    return;
-                }
 //                confirm deleting
                 currentUser.setSeries(message);
                 adminAction.put(chatId, currentUser);
+                db.commit();
 
                 List<KeyboardRow> rows = new ArrayList<>();
                 rows.add(new KeyboardRow("نعم", "لا"));
@@ -113,6 +101,20 @@ public class RemoveSeries implements AbilityExtension {
                 return;
             }
 
+            if (message.equals("لا") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(currentUser.getSeries())) {
+
+                currentUser.setSeries("");
+                adminAction.put(chatId, currentUser);
+                db.commit();
+                bot.getSilent().execute(
+                        SendMessage.builder()
+                                .text("يرجى اختيار سلسلة للحذف")
+                                .chatId(chatId)
+                                .replyMarkup(MainKeyboard.getAllSeries())
+                                .build()
+                );
+                return;
+            }
             db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId).getSeries());
 
             bot.getSilent().execute(
