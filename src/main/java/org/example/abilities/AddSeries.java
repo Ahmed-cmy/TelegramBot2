@@ -151,7 +151,7 @@ public class AddSeries implements AbilityExtension {
                     String[] messageLines = message.split("\\n");
 
                     // validate series input
-                    if (message.split("\\n").length != 3){
+                    if (message.split("\\n").length != 3) {
                         bot.getSilent().send("تأكد من الصياغة", chatId);
                         return;
                     }
@@ -170,7 +170,7 @@ public class AddSeries implements AbilityExtension {
 
                     Series series = new Series(name);
 
-                    for (int i = firstId; i < len+firstId; i++) {
+                    for (int i = firstId; i < len + firstId; i++) {
 
                         String title = "الحلقة: " + (i - firstId + 1);
                         try {
@@ -191,7 +191,6 @@ public class AddSeries implements AbilityExtension {
                             e.printStackTrace();
                         }
                         series.addLesson(new Lesson(title, linkPattern + i));
-
 
 
 //                        currentId++;

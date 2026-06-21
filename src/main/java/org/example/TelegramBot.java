@@ -11,12 +11,6 @@ import java.util.*;
 public class TelegramBot extends AbilityBot {
     public static Map<String, Series> series;
     public static Map<Long, AdminUser> adminAction;
-    public enum dataBases {
-        SERIES,
-        ADMIN_ACTIONS,
-        NORMAL_USERS,
-        EDIT_USER_STATE
-    }
 
     protected TelegramBot(TelegramClient telegramClient, String botUsername) {
         super(telegramClient, botUsername);
@@ -30,25 +24,27 @@ public class TelegramBot extends AbilityBot {
         db.commit();
 //        db.getMap(TelegramBot.dataBases.NORMAL_USERS.name()).clear();
     }
-    public AbilityExtension MainMenu(){
+
+    public AbilityExtension MainMenu() {
         return new MainMenu();
     }
 
     public AbilityExtension addSeries() {
         return new AddSeries(this);
     }
+
     public AbilityExtension welcomeMessage() {
         return new Welcome();
     }
 
-
     public AbilityExtension removeSeries() {
         return new RemoveSeries(this);
     }
-//    public AbilityExtension editSeries() {
+
+    //    public AbilityExtension editSeries() {
 //        return new EditSeries(this);
 //    }
-    public AbilityExtension linkLocator(){
+    public AbilityExtension linkLocator() {
         return new LinkLocator(this);
     }
 
@@ -60,5 +56,12 @@ public class TelegramBot extends AbilityBot {
     @Override
     public void consume(Update update) {
         super.consume(update);
+    }
+
+    public enum dataBases {
+        SERIES,
+        ADMIN_ACTIONS,
+        NORMAL_USERS,
+        EDIT_USER_STATE
     }
 }

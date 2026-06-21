@@ -9,11 +9,11 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import java.util.function.Predicate;
 
 public class Welcome implements AbilityExtension {
-    public Reply WelcomeMessage(){
+    public Reply WelcomeMessage() {
         Predicate<Update> hasMessage = (update) -> update.hasMessage();
         Predicate<Update> isMessageHasText = (update) -> update.getMessage().hasText();
         Predicate<Update> isStart = (update) -> update.getMessage().getText().equalsIgnoreCase("/start");
-        return Reply.of((bot,update)->{
+        return Reply.of((bot, update) -> {
             bot.getSilent().execute(
                     SendMessage.builder()
                             .chatId(update.getMessage().getChatId())
@@ -25,6 +25,6 @@ public class Welcome implements AbilityExtension {
                             .replyMarkup(MainKeyboard.getMainKeyboard())
                             .build()
             );
-        },hasMessage,isMessageHasText, isStart);
+        }, hasMessage, isMessageHasText, isStart);
     }
 }

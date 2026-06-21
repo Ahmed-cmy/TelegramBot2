@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainKeyboard {
-    public static ReplyKeyboardMarkup getMainKeyboard(){
+    public static ReplyKeyboardMarkup getMainKeyboard() {
         KeyboardRow row0 = new KeyboardRow("جميع السلاسل");
 
         return ReplyKeyboardMarkup.builder()
@@ -19,6 +19,7 @@ public class MainKeyboard {
                 .resizeKeyboard(true)
                 .build();
     }
+
     public static ReplyKeyboardMarkup getAllSeries() {
         List<KeyboardRow> rows = new ArrayList<>();
         List<Series> temp = new ArrayList<>(TelegramBot.series.values());
@@ -26,11 +27,11 @@ public class MainKeyboard {
         int rowNum = 0;
         for (int i = 0; i < TelegramBot.series.size(); i++) {
             rows.get(rowNum).add(temp.get(i).getName());
-            if (i %3 == 0 && i >0) {
+            if (i % 3 == 0 && i > 0) {
                 rows.add(new KeyboardRow());
                 rowNum++;
             }
-            if ((i)%2 == 0){
+            if ((i) % 2 == 0) {
                 rows.add(new KeyboardRow());
                 rowNum++;
             }

@@ -21,9 +21,9 @@ public class Main {
 
         Dotenv Token = Dotenv.load();
         String token = Token.get("TELEGRAM_BOT_TOKEN").trim();
-        try(TelegramBotsLongPollingApplication botApp = new TelegramBotsLongPollingApplication()){
+        try (TelegramBotsLongPollingApplication botApp = new TelegramBotsLongPollingApplication()) {
             TelegramClient client = new OkHttpTelegramClient(token);
-            botApp.registerBot(token,new TelegramBot(client, "Sh_Ihab_bot"));
+            botApp.registerBot(token, new TelegramBot(client, "Sh_Ihab_bot"));
             System.out.println("success");
             Thread.currentThread().join();
         } catch (Exception e) {

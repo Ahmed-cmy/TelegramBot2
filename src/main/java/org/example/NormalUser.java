@@ -8,10 +8,10 @@ import java.io.Serializable;
 public class NormalUser implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
-    private Series series ;
-    private Lesson lesson ;
-    private long chatId;
     ReplyKeyboardMarkup keyboardMarkup;
+    private Series series;
+    private Lesson lesson;
+    private long chatId;
 
     public NormalUser(long chatId) {
         this.chatId = chatId;

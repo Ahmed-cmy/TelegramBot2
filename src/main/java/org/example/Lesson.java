@@ -11,10 +11,10 @@ import java.util.List;
 public class Lesson implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+    public static int count = 0;
     private String name;
     private String voiceLink;
     private int id;
-    public static int count = 0;
 
     public Lesson(String name, String voiceLink) {
         this.name = name;
@@ -34,6 +34,10 @@ public class Lesson implements Serializable {
         return voiceLink;
     }
 
+    public void setVoiceLink(String voiceLink) {
+        this.voiceLink = voiceLink;
+    }
+
     public int getId() {
         return id;
     }
@@ -42,10 +46,7 @@ public class Lesson implements Serializable {
         this.id = id;
     }
 
-    public void setVoiceLink(String voiceLink) {
-        this.voiceLink = voiceLink;
-    }
-    public ReplyKeyboardMarkup getKeyboard(){
+    public ReplyKeyboardMarkup getKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
         rows.add(new KeyboardRow("صوتي", "فيديو"));
         rows.add(new KeyboardRow("العودة للسلسلة"));

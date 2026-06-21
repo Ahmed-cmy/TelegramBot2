@@ -206,7 +206,6 @@ public class EditSeries implements AbilityExtension {
             System.out.println("s: " + currentUser.states.toString());
 
 
-
         }, hasMessage, isMessageHasText, isNotCommand, isCommandUsed, isUserWantEdit);
     }
 

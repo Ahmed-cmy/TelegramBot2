@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 public class RemoveSeries implements AbilityExtension {
-    private Map<Long, AdminUser> adminAction;
     private final DBContext db;
     private final AbilityBot bot;
+    private Map<Long, AdminUser> adminAction;
 
     public RemoveSeries(AbilityBot bot) {
         this.bot = bot;
@@ -64,7 +64,7 @@ public class RemoveSeries implements AbilityExtension {
             AdminUser currentUser = adminAction.get(chatId);
             String seriesName = adminAction.get(chatId).getSeries();
 
-            if (currentUser.getSeries().isEmpty() ) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
+            if (currentUser.getSeries().isEmpty()) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
                 if (message.equals("العودة")) {
                     adminAction.remove(chatId);
                     bot.getSilent().send("تم الإلغاء", chatId);

@@ -9,6 +9,7 @@ import org.telegram.telegrambots.abilitybots.api.objects.Reply;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -105,7 +106,6 @@ public class MainMenu implements AbilityExtension {
                                 break;
                             }
                             currentUser.setLesson(currentUser.getSeries().getLesson(message));
-
                             currentUser.setKeyboardMarkup(currentUser.getSeries().getLesson(message).getKeyboard());
                             NormalUsersMap.put(chatId, currentUser);
                             db.commit();

@@ -51,7 +51,7 @@ public class LinkLocator implements AbilityExtension {
                 Matcher m = pattern.matcher(seriesTitle);
                 seriesTitle = m.replaceAll("").trim();
                 series.setName(seriesTitle);
-            bot.getSilent().send("اسم السلسلة : " + seriesTitle, chatId);
+                bot.getSilent().send("اسم السلسلة : " + seriesTitle, chatId);
             }
 
             if (jsonResponse.has("files")) {
@@ -70,7 +70,7 @@ public class LinkLocator implements AbilityExtension {
                         lessonTitle = m.replaceAll("").trim();
                         // تكوين الرابط المباشر
                         String encodedFileName = fileName.replace(" ", "%20");
-                        String directLink = currentURL.replace("details","download") + "/" + encodedFileName;
+                        String directLink = currentURL.replace("details", "download") + "/" + encodedFileName;
 
                         // إضافة الدرس للقائمة
                         series.addLesson(new Lesson(lessonTitle, directLink));

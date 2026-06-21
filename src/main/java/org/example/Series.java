@@ -14,10 +14,10 @@ public class Series implements Serializable {
     private static final long serialVersionUID = 1L;
     public static int numberOfSeries = 0;
     private final int id;
-    private String name;
+    private final SeriesMap lessons = new SeriesMap();
     public int page = 1;
     public int maxPages;
-    private final SeriesMap lessons = new SeriesMap();
+    private String name;
 
     public Series(String name) {
         this.name = name;
@@ -42,10 +42,11 @@ public class Series implements Serializable {
         return id;
     }
 
-    public Lesson getLesson(int i){
+    public Lesson getLesson(int i) {
         return lessons.getLesson(i);
     }
-    public Lesson getLesson(String name){
+
+    public Lesson getLesson(String name) {
         return lessons.getLesson(name);
     }
 
@@ -58,17 +59,18 @@ public class Series implements Serializable {
     }
 
     public void addLesson(Lesson lesson) {
-        maxPages = getLessons().size()/20+1;
+        maxPages = getLessons().size() / 20 + 1;
         getLessons().addLesson(lesson);
     }
+
     public void addLessonIfAbsent(Lesson lesson) {
-        maxPages = getLessons().size()/20+1;
-        if (!getLessons().getLessonsMap().containsKey(lesson.getName())){
-        getLessons().addLesson(lesson);
+        maxPages = getLessons().size() / 20 + 1;
+        if (!getLessons().getLessonsMap().containsKey(lesson.getName())) {
+            getLessons().addLesson(lesson);
         }
     }
 
-    public boolean containsId(int i){
+    public boolean containsId(int i) {
         return lessons.containsId(i);
     }
 
@@ -76,23 +78,18 @@ public class Series implements Serializable {
         List<KeyboardRow> rows = new ArrayList<>();
         int rowNumber = 0;
         rows.add(new KeyboardRow());
-//        System.out.println(page);
-        for (int i = (page-1)*20; i < (Math.min(page * 20, getLessons().size())); i++) {
+        for (int i = (page - 1) * 20; i < (Math.min(page * 20, getLessons().size())); i++) {
             if (i % 2 == 0 && i > 0) {
                 rowNumber++;
                 rows.add(new KeyboardRow());
             }
-//            System.out.println(page);
-//            System.out.println(getLessons().size() + "|" + i);
             rows.get(rowNumber).add(lessons.getLesson(i).getName());
         }
-        if (page >= 1 && page < getLessons().size()/20+1)
-        {
-        rows.add(new KeyboardRow("الصفحة التالية"));
+        if (page >= 1 && page < getLessons().size() / 20 + 1) {
+            rows.add(new KeyboardRow("الصفحة التالية"));
         }
-        if (page > 1)
-        {
-        rows.add(new KeyboardRow("الصفحة السابقة"));
+        if (page > 1) {
+            rows.add(new KeyboardRow("الصفحة السابقة"));
         }
         rows.add(new KeyboardRow("العودة للسلاسل"));
 
