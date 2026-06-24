@@ -94,7 +94,7 @@ public class MainMenu implements AbilityExtension {
                                 db.commit();
                                 break;
                             }
-                            if (message.matches("\\d+")) {
+                            if (message.matches("(?U)\\d")) {
                                 int jump = Integer.parseInt(message);
                                 if (jump > currentUser.getSeries().maxPages) {
                                     break;
