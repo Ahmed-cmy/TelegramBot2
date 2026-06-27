@@ -47,7 +47,7 @@ public class EditSeries implements AbilityExtension {
                             SendMessage.builder()
                                     .text("يرجى اختيار سلسلة للتعديل")
                                     .chatId(ctx.chatId())
-                                    .replyMarkup(MainKeyboard.getAllSeries())
+                                    .replyMarkup(MainKeyboard.getAllSeries(currentUser.page))
                                     .build()
                     );
                 })
@@ -88,7 +88,7 @@ public class EditSeries implements AbilityExtension {
                             SendMessage.builder()
                                     .text("يرجى اختيار سلسلة للتعديل")
                                     .chatId(chatId)
-                                    .replyMarkup(MainKeyboard.getAllSeries())
+                                    .replyMarkup(MainKeyboard.getAllSeries(currentUser.page))
                                     .build()
                     );
                     currentUser.states.push(AdminUser.AdminStates.SERIES_SELECT);
@@ -96,13 +96,13 @@ public class EditSeries implements AbilityExtension {
                     db.commit();
                     break;
                 case AdminUser.AdminStates.SERIES_SELECT:
-                    if (currentUser.getSeries().isEmpty()) {
+                    if (currentUser.getSeries() == null) {
 
                         if (!series.containsKey(message)) {
                             bot.getSilent().send("تحقق من اسم السلسلة", chatId);
                             break;
                         }
-                        currentUser.setSeries(message);
+                        currentUser.setSeries(TelegramBot.series.get(message));
                         currentUser.states.push(AdminUser.AdminStates.EDIT_TYPE);
                         adminAction.put(chatId, currentUser);
                         db.commit();
@@ -168,15 +168,15 @@ public class EditSeries implements AbilityExtension {
                     }
                 case AdminUser.AdminStates.SELECT_LESSON:
                     System.out.println("message" + message);
-                    currentUser.setLesson(message);
+                    currentUser.setLesson(currentUser.getSeries().getLesson(message));
                     currentUser.states.push(AdminUser.AdminStates.EDIT_LESSON);
                     adminAction.put(chatId, currentUser);
                     db.commit();
                     bot.getSilent().execute(
                             SendMessage.builder()
                                     .text("السطر ألأول للعنوان و الثاني للرابط" + "\n" +
-                                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).getName() + "\n" +
-                                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).getVoiceLink())
+                                            currentUser.getLesson().getName() + "\n" +
+                                            currentUser.getLesson().getVoiceLink())
                                     .chatId(chatId)
                                     .build()
                     );
@@ -188,8 +188,8 @@ public class EditSeries implements AbilityExtension {
                         Scanner scanner = new Scanner(message);
                         String[] lessonData = message.split("\\n");
                         if (scanner.hasNextLine() && lessonData.length != 2) {
-                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).setName(lessonData[0]);
-                            series.get(currentUser.getSeries()).getLesson(currentUser.getLesson()).setVoiceLink(lessonData[1]);
+                            currentUser.getLesson().setName(lessonData[0]);
+                            currentUser.getLesson().setVoiceLink(lessonData[1]);
                             db.commit();
                             bot.getSilent().send("تم", chatId);
                             return;

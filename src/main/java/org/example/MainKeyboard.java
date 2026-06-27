@@ -1,9 +1,6 @@
 package org.example;
 
 
-import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
-import org.telegram.telegrambots.abilitybots.api.db.DBContext;
-import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
@@ -11,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainKeyboard {
+
+    public static int numberOfElementsPerPage = 20;
+    public static int numberOfPages = TelegramBot.series.size() / numberOfElementsPerPage + 1;
+
     public static ReplyKeyboardMarkup getMainKeyboard() {
         KeyboardRow row0 = new KeyboardRow("جميع السلاسل");
 
@@ -20,12 +21,16 @@ public class MainKeyboard {
                 .build();
     }
 
-    public static ReplyKeyboardMarkup getAllSeries() {
+    public static ReplyKeyboardMarkup getAllSeries(int page) {
+        System.out.println(page);
         List<KeyboardRow> rows = new ArrayList<>();
         List<Series> temp = new ArrayList<>(TelegramBot.series.values());
+            System.out.println("page: " + page);
+//        System.out.println(d);
         rows.add(new KeyboardRow());
         int rowNum = 0;
-        for (int i = 0; i < TelegramBot.series.size(); i++) {
+        for (int i = (page - 1) * 20; i < (Math.min(page * 20, TelegramBot.series.size())); i++) {
+//            System.out.println("i " + i);
             rows.get(rowNum).add(temp.get(i).getName());
             if (i % 3 == 0 && i > 0) {
                 rows.add(new KeyboardRow());
@@ -35,6 +40,15 @@ public class MainKeyboard {
                 rows.add(new KeyboardRow());
                 rowNum++;
             }
+        }
+        rows.add(new KeyboardRow());
+        if (page > 1) {
+//            rows.add(new KeyboardRow("الصفحة السابقة"));
+            rows.getLast().add(("الصفحة السابقة"));
+        }
+        if (page >= 1 && page < numberOfPages) {
+//            rows.add(new KeyboardRow("الصفحة التالية"));
+            rows.getLast().add(("الصفحة التالية"));
         }
         rows.add(new KeyboardRow("العودة"));
         return ReplyKeyboardMarkup.builder()

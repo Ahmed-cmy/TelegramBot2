@@ -5,15 +5,16 @@ import java.io.Serializable;
 import java.util.Stack;
 
 
-public class AdminUser implements Serializable {
+public class AdminUser extends TelegramUser {
     @Serial
     private static final long serialVersionUID = 1L;
     public Stack<Enum<AdminStates>> states = new Stack<>();
     private Enum<userActions> action;
     private Enum<AdminStates> actionType;
-    private String series = "";
-    private String lesson = "";
-    private long chatId;
+//    private String series = "";
+//    private String lesson = "";
+//    public int page;
+//    private long chatId;
 
     public AdminUser(long chatId, Enum<userActions> action) {
         this.chatId = chatId;
@@ -52,29 +53,29 @@ public class AdminUser implements Serializable {
         this.action = action;
     }
 
-    public String getSeries() {
-        return series;
-    }
+//    public String getSeries() {
+//        return series;
+//    }
 
-    public void setSeries(String series) {
-        this.series = series;
-    }
+//    public void setSeries(String series) {
+//        this.series = series;
+//    }
 
-    public String getLesson() {
-        return lesson;
-    }
+//    public String getLesson() {
+//        return lesson;
+//    }
 
-    public void setLesson(String lesson) {
-        this.lesson = lesson;
-    }
+//    public void setLesson(Lesson lesson) {
+//        this.lesson = lesson;
+//    }
 
-    public long getChatId() {
-        return chatId;
-    }
+//    public long getChatId() {
+//        return chatId;
+//    }
 
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
-    }
+//    public void setChatId(long chatId) {
+//        this.chatId = chatId;
+//    }
 
     public enum AdminStates {
         BASE,

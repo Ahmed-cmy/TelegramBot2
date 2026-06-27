@@ -44,7 +44,7 @@ public class RemoveSeries implements AbilityExtension {
                             SendMessage.builder()
                                     .text("يرجى اختيار سلسلة للحذف")
                                     .chatId(ctx.chatId())
-                                    .replyMarkup(MainKeyboard.getAllSeries())
+                                    .replyMarkup(MainKeyboard.getAllSeries(1))
                                     .build()
                     );
                 })
@@ -62,22 +62,36 @@ public class RemoveSeries implements AbilityExtension {
             String message = update.getMessage().getText();
             long chatId = update.getMessage().getChatId();
             AdminUser currentUser = adminAction.get(chatId);
-            String seriesName = adminAction.get(chatId).getSeries();
+//            String seriesName = adminAction.get(chatId).getSeries();
 
-            if (currentUser.getSeries().isEmpty()) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
+            if (currentUser.getSeries() == null) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
                 if (message.equals("العودة")) {
                     adminAction.remove(chatId);
                     bot.getSilent().send("تم الإلغاء", chatId);
                     return;
                 }
+
+                if (message.equals("الصفحة التالية")) {
+                    currentUser.page++;
+                    currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
+                    adminAction.put(chatId, currentUser);
+                    db.commit();
+                    return;
+                } else if (message.equals("الصفحة السابقة")) {
+                    currentUser.page--;
+                    currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
+                    adminAction.put(chatId, currentUser);
+                    db.commit();
+                    return;
+                }
+
                 if (!db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(message)) {
                     bot.getSilent().send("تأكد من اسم السلسلة", chatId);
                     return;
                 }
 
-
 //                confirm deleting
-                currentUser.setSeries(message);
+                currentUser.setSeries(TelegramBot.series.get(message));
                 adminAction.put(chatId, currentUser);
                 db.commit();
 
@@ -103,14 +117,14 @@ public class RemoveSeries implements AbilityExtension {
 
             if (message.equals("لا") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(currentUser.getSeries())) {
 
-                currentUser.setSeries("");
+                currentUser.setSeries(null);
                 adminAction.put(chatId, currentUser);
                 db.commit();
                 bot.getSilent().execute(
                         SendMessage.builder()
                                 .text("يرجى اختيار سلسلة للحذف")
                                 .chatId(chatId)
-                                .replyMarkup(MainKeyboard.getAllSeries())
+                                .replyMarkup(MainKeyboard.getAllSeries(currentUser.page))
                                 .build()
                 );
                 return;

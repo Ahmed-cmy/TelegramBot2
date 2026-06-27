@@ -5,47 +5,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import java.io.Serial;
 import java.io.Serializable;
 
-public class NormalUser implements Serializable {
+public class NormalUser extends TelegramUser {
     @Serial
     private static final long serialVersionUID = 1L;
-    ReplyKeyboardMarkup keyboardMarkup;
-    private Series series;
-    private Lesson lesson;
-    private long chatId;
+
 
     public NormalUser(long chatId) {
         this.chatId = chatId;
     }
 
-    public ReplyKeyboardMarkup getKeyboardMarkup() {
-        return keyboardMarkup;
-    }
 
-    public void setKeyboardMarkup(ReplyKeyboardMarkup keyboardMarkup) {
-        this.keyboardMarkup = keyboardMarkup;
-    }
-
-    public Series getSeries() {
-        return series;
-    }
-
-    public void setSeries(Series series) {
-        this.series = series;
-    }
-
-    public Lesson getLesson() {
-        return lesson;
-    }
-
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
-    }
-
-    public long getChatId() {
-        return chatId;
-    }
-
-    public void setChatId(long chatId) {
-        this.chatId = chatId;
-    }
 }

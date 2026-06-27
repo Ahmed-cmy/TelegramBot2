@@ -13,22 +13,11 @@ public class Series implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     public static int numberOfSeries = 0;
-    private final int id;
     private final SeriesMap lessons = new SeriesMap();
     public int page = 1;
-    public int maxPages;
-    private String name;
-
-    public Series(String name) {
-        this.name = name;
-        Lesson.count = 0;
-        id = numberOfSeries++;
-    }
-
-    public Series() {
-        Lesson.count = 0;
-        id = numberOfSeries++;
-    }
+    public int numberOfPages;
+    String name;
+    int id;
 
     public String getName() {
         return name;
@@ -41,6 +30,23 @@ public class Series implements Serializable {
     public int getId() {
         return id;
     }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+
+    public Series(String name) {
+        this.name = name;
+        Lesson.count = 0;
+        id = numberOfSeries++;
+    }
+
+    public Series() {
+        Lesson.count = 0;
+        id = numberOfSeries++;
+    }
+
 
     public Lesson getLesson(int i) {
         return lessons.getLesson(i);
@@ -59,12 +65,12 @@ public class Series implements Serializable {
     }
 
     public void addLesson(Lesson lesson) {
-        maxPages = getLessons().size() / 20 + 1;
+        numberOfPages = getLessons().size() / 20 + 1;
         getLessons().addLesson(lesson);
     }
 
     public void addLessonIfAbsent(Lesson lesson) {
-        maxPages = getLessons().size() / 20 + 1;
+        numberOfPages = getLessons().size() / 20 + 1;
         if (!getLessons().getLessonsMap().containsKey(lesson.getName())) {
             getLessons().addLesson(lesson);
         }

@@ -12,15 +12,10 @@ public class Lesson implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
     public static int count = 0;
-    private String name;
-    private String voiceLink;
-    private int id;
 
-    public Lesson(String name, String voiceLink) {
-        this.name = name;
-        this.voiceLink = voiceLink;
-        id = count++;
-    }
+    private String voiceLink;
+    String name;
+    int id;
 
     public String getName() {
         return name;
@@ -30,20 +25,28 @@ public class Lesson implements Serializable {
         this.name = name;
     }
 
-    public String getVoiceLink() {
-        return voiceLink;
-    }
-
-    public void setVoiceLink(String voiceLink) {
-        this.voiceLink = voiceLink;
-    }
-
     public int getId() {
         return id;
     }
 
     public void setId(int id) {
         this.id = id;
+    }
+
+
+    public Lesson(String name, String voiceLink) {
+        this.name = name;
+        this.voiceLink = voiceLink;
+        id = count++;
+    }
+
+
+    public String getVoiceLink() {
+        return voiceLink;
+    }
+
+    public void setVoiceLink(String voiceLink) {
+        this.voiceLink = voiceLink;
     }
 
     public ReplyKeyboardMarkup getKeyboard() {
