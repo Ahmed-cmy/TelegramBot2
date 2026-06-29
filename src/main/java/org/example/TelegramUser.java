@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Stack;
 
 public class TelegramUser implements Serializable {
     @Serial
@@ -12,6 +13,7 @@ public class TelegramUser implements Serializable {
     ReplyKeyboardMarkup keyboardMarkup;
     Series series;
     Lesson lesson;
+    public Stack<BotElement> elementStack = new Stack<>();
     long chatId;
 
     public ReplyKeyboardMarkup getKeyboardMarkup() {

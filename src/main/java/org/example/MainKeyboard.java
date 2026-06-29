@@ -10,7 +10,8 @@ import java.util.List;
 public class MainKeyboard {
 
     public static int numberOfElementsPerPage = 20;
-    public static int numberOfPages = TelegramBot.series.size() / numberOfElementsPerPage + 1;
+    // استخدام معادلة القسمة الصحيحة بدلًا من Math.ceil لتجنب الـ casting وزيادة الأداء
+    public static int numberOfPages = (TelegramBot.series.size() + numberOfElementsPerPage - 1) / numberOfElementsPerPage;
 
     public static ReplyKeyboardMarkup getMainKeyboard() {
         KeyboardRow row0 = new KeyboardRow("جميع السلاسل");
@@ -24,7 +25,7 @@ public class MainKeyboard {
     public static ReplyKeyboardMarkup getAllSeries(int page) {
         System.out.println(page);
         List<KeyboardRow> rows = new ArrayList<>();
-        List<Series> temp = new ArrayList<>(TelegramBot.series.values());
+        List<BotElement> temp = new ArrayList<>(TelegramBot.series.values());
             System.out.println("page: " + page);
 //        System.out.println(d);
         rows.add(new KeyboardRow());

@@ -4,36 +4,18 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Series implements Serializable {
+public class Series extends BotElement {
     @Serial
     private static final long serialVersionUID = 1L;
     public static int numberOfSeries = 0;
     private final SeriesMap lessons = new SeriesMap();
     public int page = 1;
     public int numberOfPages;
-    String name;
-    int id;
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
 
     public Series(String name) {
@@ -80,7 +62,9 @@ public class Series implements Serializable {
         return lessons.containsId(i);
     }
 
+    @Override
     public ReplyKeyboardMarkup getKeyboard() {
+        numberOfPages = getLessons().size() / 20 + 1;
         List<KeyboardRow> rows = new ArrayList<>();
         int rowNumber = 0;
         rows.add(new KeyboardRow());

@@ -1,21 +1,26 @@
 package org.example;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import org.example.abilities.*;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.*;
 
 public class TelegramBot extends AbilityBot {
-    public static Map<String, Series> series;
+    public static Map<String, BotElement> series;
     public static Map<Long, AdminUser> adminAction;
 
     protected TelegramBot(TelegramClient telegramClient, String botUsername) {
@@ -24,6 +29,8 @@ public class TelegramBot extends AbilityBot {
         adminAction = db.getMap(dataBases.ADMIN_ACTIONS.name());
         silent.send("start", 1784824244L);
         series = db.getMap(dataBases.SERIES.name());
+//        backupDataToJson();
+//        restoreDataFromJson();
 //        db.getMap(dataBases.NORMAL_USERS.name()).remove(creatorId());
 //        System.out.println(series.values());
 
@@ -49,13 +56,16 @@ public class TelegramBot extends AbilityBot {
     public AbilityExtension addSeries() {
         return new AddSeries(this);
     }
+    public AbilityExtension addCategory() {
+        return new AddCategory(this);
+    }
 
     public AbilityExtension welcomeMessage() {
         return new Welcome();
     }
 
     public AbilityExtension removeSeries() {
-        return new RemoveSeries(this);
+        return new RemoveElemet(this);
     }
     public AbilityExtension reset(){
         return new ResetUsers(this);
@@ -118,5 +128,46 @@ public class TelegramBot extends AbilityBot {
         ADMIN_ACTIONS,
         NORMAL_USERS,
         EDIT_USER_STATE
+    }
+    public void backupDataToJson() {
+        try {
+            // 1. هات الداتا من الداتا بيز القديمة
+            Map<String, Series> seriesMap = db.getMap(dataBases.SERIES.name());
+
+            // 2. حول الداتا إلى JSON
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            String json = gson.toJson(seriesMap);
+
+            // 3. احفظ الـ JSON في ملف نصي
+            Files.writeString( Paths.get("series_backup.json"), json);
+
+            System.out.println("✅ تم حفظ البيانات القديمة بنجاح في ملف series_backup.json");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public void restoreDataFromJson() {
+        try {
+            // 1. اقرأ ملف الـ JSON
+            String json = Files.readString(Paths.get("series_backup.json"));
+
+            // 2. حول الـ JSON إلى Map يحتوي على الكلاسات بشكلها الجديد
+            Gson gson = new Gson();
+            Type mapType = new TypeToken<Map<String, Series>>() {}.getType();
+            Map<String, Series> restoredData = gson.fromJson(json, mapType);
+
+            // 3. هات الـ Map الخاص بالداتا بيز الجديدة (سيكون فارغاً)
+            Map<String, Series> newSeriesMap = db.getMap(dataBases.SERIES.name());
+
+            // 4. ضع الداتا المُسترجعة داخل الداتا بيز
+            newSeriesMap.putAll(restoredData);
+
+            // 5. احفظ التغييرات في الداتا بيز (مهم جداً في AbilityBot/MapDB)
+            db.commit();
+
+            System.out.println("✅ تم استرجاع البيانات للهيكلة الجديدة بنجاح!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

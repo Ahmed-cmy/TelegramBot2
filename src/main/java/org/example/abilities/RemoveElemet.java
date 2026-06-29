@@ -2,7 +2,6 @@ package org.example.abilities;
 
 import org.example.AdminUser;
 import org.example.MainKeyboard;
-import org.example.Series;
 import org.example.TelegramBot;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
@@ -21,17 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class RemoveSeries implements AbilityExtension {
+public class RemoveElemet implements AbilityExtension {
     private final DBContext db;
     private final AbilityBot bot;
     private Map<Long, AdminUser> adminAction;
 
-    public RemoveSeries(AbilityBot bot) {
+    public RemoveElemet(AbilityBot bot) {
         this.bot = bot;
         db = bot.getDb();
     }
 
-    public Ability removeSeries() {
+    public Ability removeElement() {
         return Ability.builder()
                 .name("remove")
                 .info("إزاله سلسلة")
@@ -64,7 +63,7 @@ public class RemoveSeries implements AbilityExtension {
             AdminUser currentUser = adminAction.get(chatId);
 //            String seriesName = adminAction.get(chatId).getSeries();
 
-            if (currentUser.getSeries() == null) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
+            if (currentUser.elementStack.empty()) { //|| db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(adminAction.get(chatId).getSeries())
                 if (message.equals("العودة")) {
                     adminAction.remove(chatId);
                     bot.getSilent().send("تم الإلغاء", chatId);
@@ -91,7 +90,7 @@ public class RemoveSeries implements AbilityExtension {
                 }
 
 //                confirm deleting
-                currentUser.setSeries(TelegramBot.series.get(message));
+                currentUser.elementStack.push(TelegramBot.series.get(message));
                 adminAction.put(chatId, currentUser);
                 db.commit();
 
@@ -104,10 +103,10 @@ public class RemoveSeries implements AbilityExtension {
                         .build();
 
                 bot.getSilent().send("هل انت متأكد من حذف السلسلة ", chatId);
-                Series name = (Series) db.getMap(TelegramBot.dataBases.SERIES.name()).get(message);
+                String name = currentUser.elementStack.peek().getName();
                 bot.getSilent().execute(
                         SendMessage.builder()
-                                .text(name.getName())
+                                .text(name)
                                 .chatId(chatId)
                                 .replyMarkup(confirm)
                                 .build()
@@ -115,9 +114,9 @@ public class RemoveSeries implements AbilityExtension {
                 return;
             }
 
-            if (message.equals("لا") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(currentUser.getSeries())) {
+            if (message.equals("لا") && db.getMap(TelegramBot.dataBases.SERIES.name()).containsKey(currentUser.elementStack.peek())) {
 
-                currentUser.setSeries(null);
+                currentUser.elementStack.clear();
                 adminAction.put(chatId, currentUser);
                 db.commit();
                 bot.getSilent().execute(
@@ -129,7 +128,7 @@ public class RemoveSeries implements AbilityExtension {
                 );
                 return;
             }
-            db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId).getSeries());
+            db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId).elementStack.peek().getName());
 
             bot.getSilent().execute(
                     SendMessage.builder()

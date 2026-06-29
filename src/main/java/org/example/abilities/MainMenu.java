@@ -1,9 +1,6 @@
 package org.example.abilities;
 
-import org.example.Lesson;
-import org.example.MainKeyboard;
-import org.example.NormalUser;
-import org.example.TelegramBot;
+import org.example.*;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Reply;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
@@ -33,6 +30,8 @@ public class MainMenu implements AbilityExtension {
         Predicate<Update> isNotAdminCommand = update -> !adminAction.containsKey(update.getMessage().getChatId());
 
         return Reply.of((bot, update) -> {
+            try{
+
             db = bot.getDb();
             NormalUsersMap = db.getMap(TelegramBot.dataBases.NORMAL_USERS.name());
             String message = update.getMessage().getText();
@@ -54,29 +53,134 @@ public class MainMenu implements AbilityExtension {
                         e.printStackTrace();
                     }
                 case "العودة":
-                    currentUser.setSeries(null);
-                    currentUser.setLesson(null);
+//                    currentUser.setSeries(null);
+//                    currentUser.setLesson(null);
+//                    System.out.println(currentUser.getKeyboardMarkup());
+                    currentUser.elementStack.clear();
+                    currentUser.page = 1;
                     currentUser.setKeyboardMarkup(MainKeyboard.getMainKeyboard());
                     NormalUsersMap.put(chatId, currentUser);
                     db.commit();
                     break;
                 case "العودة للسلسلة":
-                    currentUser.setLesson(null);
-                    currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+                    if (currentUser.elementStack.empty()){
+                        currentUser.setKeyboardMarkup(MainKeyboard.getMainKeyboard());
+                        NormalUsersMap.put(chatId, currentUser);
+                        db.commit();
+                        break;
+                    }
+//                    currentUser.setLesson(null);
+                    currentUser.elementStack.pop();
+                    currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
                     NormalUsersMap.put(chatId, currentUser);
                     db.commit();
                     break;
                 case "العودة للسلاسل":
-                    currentUser.setSeries(null);
-                    currentUser.setLesson(null);
+                    currentUser.elementStack.clear();
                     currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
                     NormalUsersMap.put(chatId, currentUser);
                     db.commit();
                     break;
                 default:
+//                    try {
+//
+//                        if (message.matches("(?U)\\d+")) {
+//                            int jump = Integer.parseInt(message);
+//                            if (jump > MainKeyboard.numberOfPages || jump < 1) {
+//                                break;
+//                            }
+//                            currentUser.page = jump;
+//                            NormalUsersMap.put(chatId, currentUser);
+//                            db.commit();
+//                            break;
+//                        }
+//
+//                        if (series.containsKey(message) && series.get(message) instanceof Series) {
+//                            currentUser.setSeries((Series) series.get(message));
+//                            currentUser.setKeyboardMarkup(series.get(message).getKeyboard());
+//                            NormalUsersMap.put(chatId, currentUser);
+//                            db.commit();
+//                            break;
+//                        }
+//                        if (currentUser.getSeries() != null && currentUser.getLesson() == null) {
+//                            if (message.equals("الصفحة التالية") && currentUser.getSeries().page < currentUser.getSeries().getLessons().size()) {
+//                                currentUser.getSeries().page++;
+//                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+//                                NormalUsersMap.put(chatId, currentUser);
+//                                db.commit();
+//                                break;
+//                            }
+//                            if (message.equals("الصفحة السابقة") && currentUser.getSeries().page > 0) {
+//                                currentUser.getSeries().page--;
+//                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+//                                NormalUsersMap.put(chatId, currentUser);
+//                                db.commit();
+//                                break;
+//                            }
+//                            if (message.matches("(?U)\\d")) {
+//                                int jump = Integer.parseInt(message);
+//                                if (jump > currentUser.getSeries().numberOfPages || jump < 1) {
+//                                    break;
+//                                }
+//                                currentUser.getSeries().page = jump;
+//                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+//                                NormalUsersMap.put(chatId, currentUser);
+//                                db.commit();
+//                                break;
+//                            }
+//                            try {
+//                                if (currentUser.getSeries().getLesson(message) != null) {
+//                                    currentUser.setLesson(currentUser.getSeries().getLesson(message));
+//                                    currentUser.setKeyboardMarkup(currentUser.getSeries().getLesson(message).getKeyboard());
+//                                    NormalUsersMap.put(chatId, currentUser);
+//                                    db.commit();
+//                                }
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                            break;
+//                        }
+//
+//                        if (message.equals("الصفحة التالية") && currentUser.page <= MainKeyboard.numberOfPages) {
+//                            System.out.println("الصفحة التالية");
+//                            currentUser.page++;
+//                            currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
+//                            NormalUsersMap.put(chatId, currentUser);
+//                            db.commit();
+//                            break;
+//                        } else if (message.equals("الصفحة السابقة") && currentUser.page > 0) {
+//                            currentUser.page--;
+//                            currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
+//                            NormalUsersMap.put(chatId, currentUser);
+//                            db.commit();
+//                            break;
+//                        }
+//
+//                        if (currentUser.getLesson() != null && currentUser.getSeries().getLessons().containsKey(message)) {
+//                            try {
+//
+//                                Lesson lesson = currentUser.getSeries().getLesson(currentUser.getLesson().getName());
+//                                if (message.equals("صوتي")) {
+//                                    try {
+//                                        bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getVoiceLink() + ")", chatId);
+//                                    } catch (Exception e) {
+//                                        bot.getSilent().send("حدث خطأ", chatId);
+//                                    }
+//                                    break;
+//                                }
+//                                bot.getSilent().send("نأسف غير متوفر", chatId);
+//                                return;
+//                            } catch (Exception e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
                     try {
 
-                        if (message.matches("(?U)\\d+")) {
+                        if (message.matches("^(?U)\\d+$")) {
                             int jump = Integer.parseInt(message);
                             if (jump > MainKeyboard.numberOfPages || jump < 1) {
                                 break;
@@ -86,53 +190,102 @@ public class MainMenu implements AbilityExtension {
                             db.commit();
                             break;
                         }
-
-                        if (series.containsKey(message)) {
-                            currentUser.setSeries(series.get(message));
-                            currentUser.setKeyboardMarkup(series.get(message).getKeyboard());
+                        if (currentUser.elementStack.empty() && series.containsKey(message)){
+                            currentUser.elementStack.push(series.get(message));
+                            currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
                             NormalUsersMap.put(chatId, currentUser);
                             db.commit();
                             break;
                         }
-                        if (currentUser.getSeries() != null && currentUser.getLesson() == null) {
-                            if (message.equals("الصفحة التالية") && currentUser.getSeries().page < currentUser.getSeries().getLessons().size()) {
-                                currentUser.getSeries().page++;
-                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+                        if (!currentUser.elementStack.empty()){
+                            if (currentUser.elementStack.peek() instanceof Series currentSeries){
+                            if (message.equals("الصفحة التالية") && currentSeries.page < currentSeries.numberOfPages) {
+                                currentSeries.page++;
+                                currentUser.setKeyboardMarkup(currentSeries.getKeyboard());
                                 NormalUsersMap.put(chatId, currentUser);
                                 db.commit();
                                 break;
                             }
-                            if (message.equals("الصفحة السابقة") && currentUser.getSeries().page > 0) {
-                                currentUser.getSeries().page--;
-                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+                            if (message.equals("الصفحة السابقة") && currentSeries.page > 0) {
+                                currentSeries.page--;
+                                currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
                                 NormalUsersMap.put(chatId, currentUser);
                                 db.commit();
                                 break;
                             }
-                            if (message.matches("(?U)\\d")) {
+                            if (message.matches("^(?U)\\d+$")) {
                                 int jump = Integer.parseInt(message);
-                                if (jump > currentUser.getSeries().numberOfPages || jump < 1) {
+                                if (jump > currentSeries.numberOfPages || jump < 1) {
                                     break;
                                 }
-                                currentUser.getSeries().page = jump;
-                                currentUser.setKeyboardMarkup(currentUser.getSeries().getKeyboard());
+                                currentSeries.page = jump;
+                                currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
                                 NormalUsersMap.put(chatId, currentUser);
                                 db.commit();
                                 break;
                             }
-                            try {
-                                if (currentUser.getSeries().getLesson(message) != null) {
-                                    currentUser.setLesson(currentUser.getSeries().getLesson(message));
-                                    currentUser.setKeyboardMarkup(currentUser.getSeries().getLesson(message).getKeyboard());
-                                    NormalUsersMap.put(chatId, currentUser);
-                                    db.commit();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                            if (currentSeries.getLessons().containsKey(message)){
+                                System.out.println("in the series");
+                                currentUser.elementStack.push(currentSeries.getLesson(message));
+//                                System.out.println(currentUser.state.peek().getClass());
+                                currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
+                                NormalUsersMap.put(chatId, currentUser);
+                                db.commit();
+                                break;
                             }
                             break;
-                        }
+                            }
+                            if (currentUser.elementStack.peek() instanceof Category currentCategory){
 
+                                if (message.equals("الصفحة التالية") && currentCategory.page < currentCategory.numberOfPages) {
+                                    currentCategory.page++;
+                                    currentUser.setKeyboardMarkup(currentCategory.getKeyboard());
+                                    NormalUsersMap.put(chatId, currentUser);
+                                    db.commit();
+                                    break;
+                                }
+                                if (message.equals("الصفحة السابقة") && currentCategory.page > 0) {
+                                    currentCategory.page--;
+                                    currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
+                                    NormalUsersMap.put(chatId, currentUser);
+                                    db.commit();
+                                    break;
+                                }
+                                if (message.matches("^(?U)\\d+$")) {
+                                    int jump = Integer.parseInt(message);
+                                    if (jump > currentCategory.numberOfPages || jump < 1) {
+                                        break;
+                                    }
+                                    currentCategory.page = jump;
+                                    currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
+                                    NormalUsersMap.put(chatId, currentUser);
+                                    db.commit();
+                                    break;
+                                }
+                                if (currentCategory.getMap().containsKey(message)){
+                                    System.out.println("in the series");
+                                    currentUser.elementStack.push(currentCategory.getSeries(message));
+//                                System.out.println(currentUser.state.peek().getClass());
+                                    currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
+                                    NormalUsersMap.put(chatId, currentUser);
+                                    db.commit();
+                                    break;
+                                }
+                                break;
+                            }
+                        }
+                        if (!currentUser.elementStack.empty() && currentUser.elementStack.peek() instanceof Lesson lesson){
+                            if (message.equals("صوتي")) {
+                                    try {
+                                        bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getVoiceLink() + ")", chatId);
+                                    } catch (Exception e) {
+                                        bot.getSilent().send("حدث خطأ", chatId);
+                                    }
+                                    break;
+                                }
+                                bot.getSilent().send("نأسف غير متوفر", chatId);
+                                return;
+                        }
                         if (message.equals("الصفحة التالية") && currentUser.page <= MainKeyboard.numberOfPages) {
                             System.out.println("الصفحة التالية");
                             currentUser.page++;
@@ -147,26 +300,6 @@ public class MainMenu implements AbilityExtension {
                             db.commit();
                             break;
                         }
-
-                        if (currentUser.getLesson() != null) {
-                            try {
-
-                                Lesson lesson = currentUser.getSeries().getLesson(currentUser.getLesson().getName());
-                                if (message.equals("صوتي")) {
-                                    try {
-                                        bot.getSilent().sendMd("[" + lesson.getName() + "](" + lesson.getVoiceLink() + ")", chatId);
-                                    } catch (Exception e) {
-                                        bot.getSilent().send("حدث خطأ", chatId);
-                                    }
-                                    break;
-                                }
-                                bot.getSilent().send("نأسف غير متوفر", chatId);
-                                return;
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        }
-
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -178,6 +311,8 @@ public class MainMenu implements AbilityExtension {
 //                                                        " من " + currentUser.getSeries().maxPages +
 //                                                        "\n يمكنك ان تنتقل إلى الصفحة بكتابة رقم الصفحة" :
 //                                                        "اختر السلسلة";
+//            System.out.println(currentUser.state.peek().getClass());
+//            System.out.println(currentUser.getKeyboardMarkup());
             bot.getSilent().execute(
                     SendMessage.builder()
                             .chatId(chatId)
@@ -185,32 +320,36 @@ public class MainMenu implements AbilityExtension {
                             .replyMarkup(currentUser.getKeyboardMarkup())
                             .build()
             );
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
 
         }, hasMessage, isMessageHasText, isNotCommand, isNotAdminCommand);
     }
     private String generateMessageText(NormalUser currentUser) {
         // الشرط الأول
-        if (currentUser.getLesson() != null) {
-            return currentUser.getLesson().getName();
+        if (currentUser.elementStack.empty() && currentUser.getKeyboardMarkup().equals(MainKeyboard.getMainKeyboard())) {
+            return "الصفحة الرئيسية";
         }
 
         // الشرط الثاني
-        if (currentUser.getSeries() != null) {
-            return currentUser.getSeries().getName() +
-                    "\nالصفحة: " + currentUser.getSeries().page +
-                    " من " + currentUser.getSeries().numberOfPages +
-                    "\n يمكنك ان تنتقل إلى الصفحة بكتابة رقم الصفحة";
-        }
-        if (!currentUser.getKeyboardMarkup().equals(MainKeyboard.getMainKeyboard())){
+        if (currentUser.elementStack.empty() && !currentUser.getKeyboardMarkup().equals(MainKeyboard.getMainKeyboard())){
             return String.format("""
                     الصفحة %d  من  %d
                     
                     يمكنك ان تنتقل إلى الصفحة بكتابة رقم الصفحة
                     """, currentUser.page, MainKeyboard.numberOfPages);
         }
+        if (currentUser.elementStack.peek() instanceof Series currentSeries) {
+            return currentUser.elementStack.peek().getName() +
+                    "\nالصفحة: " + currentSeries.page +
+                    " من " + currentSeries.numberOfPages +
+                    "\n يمكنك ان تنتقل إلى الصفحة بكتابة رقم الصفحة";
+        }
 
         // الحالة الافتراضية (الـ else)
-        return "الصفحة الرئيسية";
+            return currentUser.elementStack.peek().getName();
     }
 
     //    public void sendLessonAudio(NormalUser currentUser, BaseAbilityBot bot) {

@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.Serial;
-import java.io.Serializable;
 import java.util.Stack;
 
 
@@ -91,6 +90,7 @@ public class AdminUser extends TelegramUser {
 
     public static enum userActions {
         ADD_SERIES,
+        ADD_CATEGORY,
         REMOVE_SERIES,
         EDIT
     }

@@ -8,30 +8,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lesson implements Serializable {
+public class Lesson extends BotElement {
     @Serial
     private static final long serialVersionUID = 1L;
     public static int count = 0;
 
     private String voiceLink;
-    String name;
-    int id;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
 
     public Lesson(String name, String voiceLink) {
@@ -49,6 +31,7 @@ public class Lesson implements Serializable {
         this.voiceLink = voiceLink;
     }
 
+    @Override
     public ReplyKeyboardMarkup getKeyboard() {
         List<KeyboardRow> rows = new ArrayList<>();
         rows.add(new KeyboardRow("صوتي", "فيديو"));

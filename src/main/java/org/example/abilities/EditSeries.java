@@ -20,7 +20,7 @@ public class EditSeries implements AbilityExtension {
     private final DBContext db;
     private final AbilityBot bot;
     private Map<Long, AdminUser> adminAction;
-    private Map<String, Series> series;
+    private Map<String, BotElement> series;
 
     public EditSeries(AbilityBot bot) {
         this.bot = bot;
@@ -102,7 +102,7 @@ public class EditSeries implements AbilityExtension {
                             bot.getSilent().send("تحقق من اسم السلسلة", chatId);
                             break;
                         }
-                        currentUser.setSeries(TelegramBot.series.get(message));
+                        currentUser.setSeries((Series) TelegramBot.series.get(message));
                         currentUser.states.push(AdminUser.AdminStates.EDIT_TYPE);
                         adminAction.put(chatId, currentUser);
                         db.commit();

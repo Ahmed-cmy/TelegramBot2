@@ -26,18 +26,7 @@ public class ResetUsers implements AbilityExtension {
                 .privacy(Privacy.CREATOR)
                 .locality(Locality.ALL)
                 .action(ctx -> {
-// 1. Fetch the exact target map
-                    Map<Object, Object> targetMap = bot.getDb().getMap(TelegramBot.dataBases.NORMAL_USERS.name());
-
-// 2. Duplicate the keys into a separate set to avoid ConcurrentModificationException
-                    Set<Object> keysToRemove = new HashSet<>(targetMap.keySet());
-
-// 3. Delete only these specific keys from the database context
-                    for (Object key : keysToRemove) {
-                        targetMap.remove(key);
-                    }
-
-// 4. Safely commit only the updated mappings
+                    bot.getDb().getMap(TelegramBot.dataBases.NORMAL_USERS.name());
                     bot.getDb().commit();
 
                     bot.getSilent().send("rested", bot.creatorId());
