@@ -1,8 +1,6 @@
 package org.example.abilities;
 
-import org.example.AdminUser;
-import org.example.MainKeyboard;
-import org.example.TelegramBot;
+import org.example.*;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.db.DBContext;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -128,7 +126,13 @@ public class RemoveElemet implements AbilityExtension {
                 );
                 return;
             }
-            db.getMap(TelegramBot.dataBases.SERIES.name()).remove(adminAction.get(chatId).elementStack.peek().getName());
+            if (currentUser.elementStack.peek() instanceof Category category){
+                List<Series> seriesList = new ArrayList<>(category.getMap().values());
+                for (int i = 0; i < category.getMap().size(); i++) {
+                    TelegramBot.series.put(seriesList.get(i).getName(),seriesList.get(i));
+                }
+            }
+            db.getMap(TelegramBot.dataBases.SERIES.name()).remove(currentUser.elementStack.peek().getName());
 
             bot.getSilent().execute(
                     SendMessage.builder()

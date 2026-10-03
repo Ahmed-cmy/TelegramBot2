@@ -1,7 +1,6 @@
 package org.example;
 
 import java.io.Serial;
-import java.util.Stack;
 
 public class NormalUser extends TelegramUser {
     @Serial

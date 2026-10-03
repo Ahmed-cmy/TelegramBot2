@@ -39,7 +39,7 @@ public class AddCategory implements AbilityExtension {
                 .privacy(ADMIN)
                 .locality(ALL)
                 .action(ctx -> {
-                    System.out.println("add category");
+//                    System.out.println("add category");
                     adminAction = TelegramBot.adminAction;
                     adminAction.put(ctx.chatId(), new AdminUser(ctx.chatId(), AdminUser.userActions.ADD_CATEGORY));
                     db.commit();
@@ -72,7 +72,7 @@ public class AddCategory implements AbilityExtension {
                 long chatId = update.getMessage().getChatId();
                 AdminUser currentUser = adminAction.get(chatId);
                 String message = update.getMessage().getText();
-                System.out.println(currentUser.elementStack);
+//                System.out.println(currentUser.elementStack);
 
                 if (message.equals("إلغاء")) {
                     adminAction.remove(chatId);
@@ -80,7 +80,7 @@ public class AddCategory implements AbilityExtension {
                     return;
                 }
                 if (message.equals("الصفحة التالية") && currentUser.page <= MainKeyboard.numberOfPages) {
-                    System.out.println("الصفحة التالية");
+//                    System.out.println("الصفحة التالية");
                     currentUser.page++;
                     currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
                     try {

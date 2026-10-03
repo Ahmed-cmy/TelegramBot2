@@ -184,7 +184,7 @@ public class AddSeries implements AbilityExtension {
                                 Matcher m = pattern.matcher(title);
                                 title = m.replaceAll("").trim();
                             } else {
-                                System.out.println("Message not found or text is empty.");
+//                                System.out.println("Message not found or text is empty.");
                             }
 
                         } catch (Exception e) {

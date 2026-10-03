@@ -85,14 +85,16 @@ public class AdminUser extends TelegramUser {
         EDIT_LESSON,
         SELECT_LESSON,
         ADD_FROM_INTERNET_ARCHIVE,
-        ADD_FROM_CHANNEL
+        ADD_FROM_CHANNEL,
+        CATEGORY_SELECT
     }
 
     public static enum userActions {
         ADD_SERIES,
         ADD_CATEGORY,
         REMOVE_SERIES,
-        EDIT
+        EDIT,
+        EDIT_CATEGORY
     }
 
 }

@@ -71,7 +71,7 @@ public class TelegramBot extends AbilityBot {
         return new ResetUsers(this);
     }
 
-    //    public AbilityExtension editSeries() {
+//        public AbilityExtension editSeries() {
 //        return new EditSeries(this);
 //    }
     public AbilityExtension linkLocator() {
@@ -108,12 +108,12 @@ public class TelegramBot extends AbilityBot {
                 response.headers().firstValue("Content-Length").ifPresentOrElse(size -> {
                     long bytes = Long.parseLong(size);
                     mb[0] = bytes / (1024.0 * 1024.0);
-                    System.out.printf("size: %.2f MB%n", mb[0]);
+//                    System.out.printf("size: %.2f MB%n", mb[0]);
                 }, () -> {
-                    System.out.println("server didnt return the size (Content-Length not found).");
+//                    System.out.println("server didnt return the size (Content-Length not found).");
                 });
             } else {
-                System.out.println("url not working. error: " + response.statusCode());
+//                System.out.println("url not working. error: " + response.statusCode());
             }
 
         } catch (Exception e) {

@@ -23,10 +23,10 @@ public class MainKeyboard {
     }
 
     public static ReplyKeyboardMarkup getAllSeries(int page) {
-        System.out.println(page);
+//        System.out.println(page);
         List<KeyboardRow> rows = new ArrayList<>();
         List<BotElement> temp = new ArrayList<>(TelegramBot.series.values());
-            System.out.println("page: " + page);
+//            System.out.println("page: " + page);
 //        System.out.println(d);
         rows.add(new KeyboardRow());
         int rowNum = 0;

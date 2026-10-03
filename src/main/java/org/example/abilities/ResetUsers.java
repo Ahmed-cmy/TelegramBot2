@@ -1,6 +1,5 @@
 package org.example.abilities;
 
-import org.example.NormalUser;
 import org.example.TelegramBot;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
 import org.telegram.telegrambots.abilitybots.api.objects.Ability;
@@ -8,9 +7,6 @@ import org.telegram.telegrambots.abilitybots.api.objects.Locality;
 import org.telegram.telegrambots.abilitybots.api.objects.Privacy;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class ResetUsers implements AbilityExtension {
 

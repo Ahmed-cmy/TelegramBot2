@@ -40,7 +40,7 @@ public class MainMenu implements AbilityExtension {
             db.commit();
 
             NormalUser currentUser = NormalUsersMap.get(chatId);
-            System.out.println(currentUser.page);
+//            System.out.println(currentUser.page);
 
             switch (message) {
                 case "جميع السلاسل":
@@ -186,6 +186,7 @@ public class MainMenu implements AbilityExtension {
                                 break;
                             }
                             currentUser.page = jump;
+                            currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
                             NormalUsersMap.put(chatId, currentUser);
                             db.commit();
                             break;
@@ -225,7 +226,7 @@ public class MainMenu implements AbilityExtension {
                                 break;
                             }
                             if (currentSeries.getLessons().containsKey(message)){
-                                System.out.println("in the series");
+//                                System.out.println("in the series");
                                 currentUser.elementStack.push(currentSeries.getLesson(message));
 //                                System.out.println(currentUser.state.peek().getClass());
                                 currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
@@ -263,7 +264,7 @@ public class MainMenu implements AbilityExtension {
                                     break;
                                 }
                                 if (currentCategory.getMap().containsKey(message)){
-                                    System.out.println("in the series");
+//                                    System.out.println("in the series");
                                     currentUser.elementStack.push(currentCategory.getSeries(message));
 //                                System.out.println(currentUser.state.peek().getClass());
                                     currentUser.setKeyboardMarkup(currentUser.elementStack.peek().getKeyboard());
@@ -287,7 +288,7 @@ public class MainMenu implements AbilityExtension {
                                 return;
                         }
                         if (message.equals("الصفحة التالية") && currentUser.page <= MainKeyboard.numberOfPages) {
-                            System.out.println("الصفحة التالية");
+//                            System.out.println("الصفحة التالية");
                             currentUser.page++;
                             currentUser.setKeyboardMarkup(MainKeyboard.getAllSeries(currentUser.page));
                             NormalUsersMap.put(chatId, currentUser);
