@@ -14,6 +14,14 @@ import java.net.InetSocketAddress;
 public class Main {
     public static void main(String[] args) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress(80), 0);
+        server.createContext("/", exchange -> {
+            String response = "Bot is running!";
+            exchange.sendResponseHeaders(200, response.length());
+            try (java.io.OutputStream os = exchange.getResponseBody()) {
+                os.write(response.getBytes());
+            }
+        });
+        server.start();
 
         String token = System.getenv("TELEGRAM_BOT_TOKEN");
         if (token == null || token.isEmpty()){
@@ -28,7 +36,6 @@ public class Main {
             botApp.registerBot(token, new TelegramBot(client, "Sh_Ihab_bot"));
             System.out.println("success");
             Thread.currentThread().join();
-            server.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
