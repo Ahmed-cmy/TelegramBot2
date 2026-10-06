@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import org.example.abilities.*;
 import org.telegram.telegrambots.abilitybots.api.bot.AbilityBot;
+import org.telegram.telegrambots.abilitybots.api.db.MapDBContext;
 import org.telegram.telegrambots.abilitybots.api.util.AbilityExtension;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
@@ -24,7 +25,14 @@ public class TelegramBot extends AbilityBot {
     public static Map<Long, AdminUser> adminAction;
 
     protected TelegramBot(TelegramClient telegramClient, String botUsername) {
-        super(telegramClient, botUsername);
+//        super(telegramClient, botUsername);
+        super(telegramClient, botUsername,
+                MapDBContext.offlineInstance(
+                        System.getenv("HOME") != null
+                                ? "/home/site/wwwroot/" + botUsername
+                                : botUsername
+                )
+        );
         this.onRegister();
         adminAction = db.getMap(dataBases.ADMIN_ACTIONS.name());
         silent.send("start", 1784824244L);
